@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nucleibackend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nuclei_backend
+  template:
+    metadata:
+      labels:
+        app: nuclei_backend
+    spec:
+      containers:
+        - name: nucleibackend
+          image: ronnytec/nuclei:latest
+          ports:
+            - containerPort: 8080
+          securityContext:
+            runAsUser: 0

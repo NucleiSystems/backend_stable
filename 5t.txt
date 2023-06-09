@@ -1,0 +1,41 @@
+Determine your target customers
+    It could be segments, personas…
+    Size of the target audience
+
+Identify underserved customer’s needs
+    What is the problem we are trying to solve?
+    What do you think the biggest pain is?
+    How do people today solve these needs?
+
+Define your value proposition
+    How does it fulfill the need(s)?
+    How is it different and better from what people are doing today to solve their needs?
+    Does it increase the number of new users or increase retention or increase cross-sell?
+
+Existing solutions in the market
+    Are there other companies doing the same?
+    Are there other groups or teams doing the same?
+    Are there relevant companies to this product?
+
+What are the most challenging aspects
+    Will there be competitive challenges?
+    Will there be technical challenges?
+    Will there be data challenges?
+    Are there specific pre-requirements to meet?
+    Does it require a large involvement or investment from users or customers?
+
+What do we want to learn from the PoC
+    What would be encouraging?
+    What would be discouraging?
+    What is a non-goal?
+    How would the PoC convince us to go further?
+
+Specify a PoC
+    Rough description of the goal for something worth 2-3 weeks of efforts for 2-3 people
+    As a [type of user], I want to [do something], so that I can [desired benefit]
+
+After the PoC
+    Assuming we go forward with that idea, how do we see the product in 6months? 1 year?
+    What benefits would users get?
+    What are the next features coming up?
+    Any other areas of expansion?

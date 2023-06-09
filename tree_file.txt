@@ -1,0 +1,105 @@
+
+Folder PATH listing for volume coding_drive
+Volume serial number is 90CE-93C1
+H:.
+|   .coverage
+|   .gitattributes
+|   .gitignore
+|   5t.txt
+|   backend-dev_ver.code-workspace
+|   CODE_OF_CONDUCT.md
+|   config.yml
+|   Contributing.md
+|   docker-compose.yaml
+|   jsconfig.json
+|   LICENSE
+|   poetry.lock
+|   pyproject.toml
+|   README.md
+|   requirements.txt
+|   start-back.ps1
+|   start-front.ps1
+|   TODO.md
+|   tree_file.txt
+|   
++---.vscode
+|       settings.json
+|       
++---misc
+|       build_md.py
+|       project_line_counter.py
+|       tempCodeRunnerFile.py
+|       
++---nuclei_backend
+|   |   Dockerfile
+|   |   main.py
+|   |   __init__.py
+|   |   
+|   +---database
+|   |   |   nuclei.db
+|   |   |   __init__.py
+|   |   |   
+|   |           
+|   +---storage_service
+|   |   |   CompressionBase.py
+|   |   |   config.py
+|   |   |   ipfs_model.py
+|   |   |   ipfs_routes.py
+|   |   |   ipfs_schema.py
+|   |   |   ipfs_utils.py
+|   |   |   main.py
+|   |   |   WorkerBase.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---image_compression
+|   |   |   |   Dockerfile
+|   |   |   |   image_compression_routes.py
+|   |   |   |   image_compression_utils.py
+|   |   |   |   image_compression_worker.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   +---_compression_temp
+|   |   |           
+|   |   +---misc_compression
+|   |   |   |   data_modifiers.py
+|   |   |   |   Dockerfile
+|   |   |   |   file_compression_worker.py
+|   |   |   |   misc_compression_routes.py
+|   |   |   |   misc_compression_utils.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   +---_compression_temp
+|   |   |           
+|   |   +---processing_temp
+|   |   +---video_compression
+|   |   |   |   data_modifiers.py
+|   |   |   |   Dockerfile
+|   |   |   |   video_compression_routes.py
+|   |   |   |   video_compression_utils.py
+|   |   |   |   video_compression_worker.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   +---_compression_temp
+|   |   |           
+|   |   +---_compression_temp
+|   |           
+|   +---syncing_service
+|   |       syncing_service_models.py
+|   |       __init__.py
+|   |       
+|   +---users
+|   |   |   auth_routes.py
+|   |   |   auth_utils.py
+|   |   |   Config.py
+|   |   |   main.py
+|   |   |   user_handler.py
+|   |   |   user_handler_utils.py
+|   |   |   user_models.py
+|   |   |   user_schemas.py
+|   |   |   
+|   |           
+|           
++---tests
+|       auth_tests.py
+|       
+        
