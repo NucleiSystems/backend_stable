@@ -62,6 +62,10 @@ async def compress_task_image(
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
+    # print the files
+    for file in files:
+        print(file.filename)
+        print(file.file)
     if not files:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
