@@ -22,7 +22,7 @@ def process_file(
         if ipfs_flag:
             print("before ipfs flag")
             try:
-                ipfs_cid = compressing_file.commit_to_ipfs(
+                compressing_file.commit_to_ipfs(
                     compressed_file, filename, identity_token, db
                 )
             except Exception as e:
@@ -33,7 +33,7 @@ def process_file(
 
 
 def process_files(
-    files: List[UploadFile],  # noqa: F405
+    files: List[UploadFile],
     ipfs_flag: bool | None = True,
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
@@ -41,11 +41,9 @@ def process_files(
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = []
         for file in files:
-            _file = file.file
-            _file = _file.read()
             _filename = file.filename.replace(" ", "_")
             future = executor.submit(
-                process_file, _file, _filename, ipfs_flag, identity_token, db
+                process_file, file, _filename, ipfs_flag, identity_token, db
             )
             futures.append(future)
 
