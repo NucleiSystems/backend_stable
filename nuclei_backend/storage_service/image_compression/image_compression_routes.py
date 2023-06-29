@@ -66,6 +66,7 @@ async def compress_task_image(
     for file in files:
         print(file.filename)
         print(file.file)
+
     if not files:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -74,6 +75,9 @@ async def compress_task_image(
     try:
         background_tasks.add_task(process_files, files, ipfs_flag, identity_token, db)
 
-        return {"message": "Files submitted for compression"}, status.HTTP_202_ACCEPTED
+        return {
+            "message": "Files submitted for compression",
+            "files": [file.filename for file in files],
+        }, status.HTTP_202_ACCEPTED
     except Exception as e:
         return {"error": e}
