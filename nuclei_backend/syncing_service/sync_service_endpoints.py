@@ -121,6 +121,15 @@ async def delete(user: User = Depends(get_current_user), db=Depends(get_db)):
     return {}
 
 
+@sync_router.get("/fetch/user_data")
+def get_user_data_length(user: User = Depends(get_current_user), db=Depends(get_db)):
+    return {
+        "user_data_length": len(
+            db.query(DataStorage).filter(DataStorage.owner_id == user.id).all()
+        )
+    }
+
+
 @sync_router.post("/fetch/delete/all")
 def delete_all(user: User = Depends(get_current_user), db=Depends(get_db)):
     db.query(DataStorage).delete()
