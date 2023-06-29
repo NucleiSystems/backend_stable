@@ -15,6 +15,7 @@ def process_file(
 ) -> None:
     try:
         compressing_file = CompressImage(file, filename)
+
         print("files compressed")
         compressed_file = compressing_file.produce_compression()
         print(compressed_file)
