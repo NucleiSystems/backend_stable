@@ -49,11 +49,20 @@ class CompressImage(CompressionImpl):
                 chunks = [original_data]
             else:
                 compression_processes = os.cpu_count()
-                (file_size // compression_processes) + 1
+                chunk_size = (file_size // compression_processes) + 1
                 chunks = np.array_split(original_data, compression_processes)
 
             with ProcessPoolExecutor(max_workers=compression_processes) as executor:
                 compressed_chunks = executor.map(self.compress_data, chunks)
-            return b"".join(list(compressed_chunks)).encode("utf-8")
+
+            compressed_data = b"".join(
+                chunk for chunk in compressed_chunks if isinstance(chunk, bytes)
+            )
+
+            return (
+                compressed_data.encode("utf-8")
+                if isinstance(compressed_data, bytes)
+                else None
+            )
         except Exception as e:
             print(e)
