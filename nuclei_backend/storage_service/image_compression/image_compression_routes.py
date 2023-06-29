@@ -4,9 +4,10 @@ from fastapi import BackgroundTasks, Depends, HTTPException, UploadFile, status
 
 from ...users.auth_utils import get_current_user
 from ...users.user_handler_utils import get_db
-from ..ipfs_utils import *  # noqa: F403
+from ..ipfs_utils import assemble_record, generate_hash, produce_cid, produce_record
 from ..main import storage_service
 from .image_compression_utils import CompressImage
+from typing import List
 
 
 def process_file(
@@ -16,6 +17,7 @@ def process_file(
         compressing_file = CompressImage(file, filename)
         print("files compressed")
         compressed_file = compressing_file.produce_compression()
+        print(compressed_file)
         if ipfs_flag:
             print("before ipfs flag")
             try:
