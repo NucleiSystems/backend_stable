@@ -38,20 +38,22 @@ class CompressImage(CompressionImpl):
             return e
 
     def produce_compression(self) -> bytes:
-        with open(self.compression_temp_file[0], "rb") as f:
-            original_data = np.fromfile(f, dtype=np.uint8)
+        try:
+            with open(self.compression_temp_file[0], "rb") as f:
+                original_data = np.fromfile(f, dtype=np.uint8)
 
-        file_size = len(original_data)
-        avg_image_size = 5000000  # example average size of an image in bytes
-        if file_size < avg_image_size * 0.8:
-            compression_processes = 1
-            chunks = [original_data]
-        else:
-            compression_processes = os.cpu_count()
-            (file_size // compression_processes) + 1
-            chunks = np.array_split(original_data, compression_processes)
+            file_size = len(original_data)
+            avg_image_size = 5000000  # example average size of an image in bytes
+            if file_size < avg_image_size * 0.8:
+                compression_processes = 1
+                chunks = [original_data]
+            else:
+                compression_processes = os.cpu_count()
+                (file_size // compression_processes) + 1
+                chunks = np.array_split(original_data, compression_processes)
 
-        with ProcessPoolExecutor(max_workers=compression_processes) as executor:
-            compressed_chunks = executor.map(self.compress_data, chunks)
-
-        return b"".join(list(compressed_chunks)).encode("utf-8")
+            with ProcessPoolExecutor(max_workers=compression_processes) as executor:
+                compressed_chunks = executor.map(self.compress_data, chunks)
+            return b"".join(list(compressed_chunks)).encode("utf-8")
+        except Exception as e:
+            print(e)
