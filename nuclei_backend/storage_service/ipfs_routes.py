@@ -6,7 +6,7 @@ from typing import *  # noqa: F403
 import sqlalchemy.exc
 from fastapi import Depends, File, HTTPException, UploadFile
 
-from nuclei_backend.users.user_models import User
+from ..users.user_models import User
 
 from ..users.auth_utils import get_current_user
 from ..users.user_handler_utils import get_db
