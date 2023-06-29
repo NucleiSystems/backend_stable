@@ -24,7 +24,6 @@ def process_file(
                 )
             except Exception as e:
                 print(f"the error was {e}")
-            print(f"IPFS CID for {filename}: {ipfs_cid}")
         compressing_file.cleanup_compression_outcome()
     except Exception as e:
         print(f"Error compressing and storing file {filename}: {str(e)}")
