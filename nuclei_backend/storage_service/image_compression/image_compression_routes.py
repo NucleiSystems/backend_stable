@@ -8,6 +8,7 @@ from ..ipfs_utils import *
 from ..main import storage_service
 from .image_compression_utils import CompressImage
 from typing import List
+import io
 
 
 def process_file(
@@ -42,8 +43,9 @@ def process_files(
         futures = []
         for file in files:
             _filename = file.filename.replace(" ", "_")
+            _file = file.file.read()  # Read the file contents as bytes
             future = executor.submit(
-                process_file, file, _filename, ipfs_flag, identity_token, db
+                process_file, _file, _filename, ipfs_flag, identity_token, db
             )
             futures.append(future)
 
