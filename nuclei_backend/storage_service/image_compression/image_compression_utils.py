@@ -59,10 +59,6 @@ class CompressImage(CompressionImpl):
                 chunk for chunk in compressed_chunks if isinstance(chunk, bytes)
             )
 
-            return (
-                compressed_data.encode("utf-8")
-                if isinstance(compressed_data, bytes)
-                else None
-            )
+            return compressed_data if isinstance(compressed_data, bytes) else None
         except Exception as e:
             print(e)
