@@ -25,6 +25,7 @@ class CompressionImpl:
         }
 
     def save_to_temp(self, file_bytes: bytes, filename) -> tuple:
+        print("saving to temp")
         temp_dir = self.path_variation[self.app_path]
         temp_dir.mkdir(exist_ok=True)
         self.file_type = filename[int(filename.index(".")) :]
@@ -32,10 +33,13 @@ class CompressionImpl:
         self.temp_file_identity = temp_file_identity
         temp_file = temp_dir / temp_file_identity
         temp_file.write_bytes(file_bytes)
+        print("saved to temp")
         return (temp_file, temp_file_identity)
 
     def cleanup_file(self, temp_file: str) -> None:
+        print("cleaning")
         pathlib.Path(temp_file).unlink()
+        print("cleaned")
 
     def temp_compression_save(self, file_path: str) -> str:
         temp_file_index = file_path.find("temp_file")
@@ -48,6 +52,7 @@ class CompressionImpl:
 
     def commit_to_ipfs(self, file, filename: str, user, db) -> str:
         cid: str = produce_cid(file, filename)
+        print(cid)
         data_record = assemble_record(file, filename, cid, user.id)
         db.add(data_record)
         db.commit()
