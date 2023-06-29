@@ -1,11 +1,10 @@
-import traceback
-from celery import Celery
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from functools import lru_cache
 import uuid
 import secrets
+
 
 class Nuclei(FastAPI):
     def __init__(
@@ -13,7 +12,7 @@ class Nuclei(FastAPI):
         *,
         title: str = "Nuclei",
         description: str = "Nuclei API",
-        version: str = "0.1.0"
+        version: str = "0.1.0",
     ):
         super().__init__(title=title, description=description, version=version)
         self.add_models()
@@ -28,7 +27,10 @@ class Nuclei(FastAPI):
             allow_methods=["*"],
             allow_headers=["*"],
         )
-        self.add_middleware(SessionMiddleware, secret_key=f"{uuid.uuid4()}{secrets.token_hex(25)}{uuid.uuid4()}{secrets.token_urlsafe(25)}")
+        self.add_middleware(
+            SessionMiddleware,
+            secret_key=f"{uuid.uuid4()}{secrets.token_hex(25)}{uuid.uuid4()}{secrets.token_urlsafe(25)}",
+        )
 
     @lru_cache(maxsize=None)
     def add_routes(self):
@@ -43,7 +45,7 @@ class Nuclei(FastAPI):
     @lru_cache(maxsize=None)
     def add_models(self):
         from .database import engine
-        
+
         from .storage_service import ipfs_model
         from .users import user_models
 

@@ -3,7 +3,7 @@ import subprocess
 
 def docker_refresher():
     # build the Docker image
-    build_command = "docker build ."
+    build_command = "docker build -f Dockerfile.app -t ronnytec/nuclei:latest ."
     output = subprocess.check_output(
         build_command,
         shell=True,

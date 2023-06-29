@@ -22,7 +22,7 @@ def login_for_access_token(
     """
     This function handles user authentication and generates an access token for the user to access
     protected routes.
-    
+
     :param form_data: The form data is the data submitted by the user in the login form, which includes
     the username and password
     :type form_data: OAuth2PasswordRequestForm
@@ -50,49 +50,40 @@ def login_for_access_token(
 
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 @users_router.post("/token/check")
 async def verify_token(token: str):
     try:
-        
         token_data = jwt.decode(
-            token, 
-            UsersConfig.SECRET_KEY, 
-            algorithms=[UsersConfig.ALGORITHM]
+            token, UsersConfig.SECRET_KEY, algorithms=[UsersConfig.ALGORITHM]
         )
-        
+
         sub = token_data.get("sub")
-        expiration_time = datetime.datetime.fromtimestamp(token_data["exp"])
-        
-        if expiration_time >= datetime.datetime.now():
-            return {"token": f"expired: {expiration_time}","sub":sub, "status": 401}
+        expiration_time = datetime.fromtimestamp(token_data["exp"])
+
+        if expiration_time >= datetime.now():
+            return {"token": f"expired: {expiration_time}", "sub": sub, "status": 401}
 
     except JWTError:
         raise HTTPException(
-            status_code=401, 
-            detail="Invalid authentication credentials"
+            status_code=401, detail="Invalid authentication credentials"
         )
-        
+
     return {"status": "checked"}
+
 
 @users_router.post("/token/refresh")
 def login_for_access_token(
     db=Depends(user_handler_utils.get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        
         access_token_expires = timedelta(minutes=30)
         access_token = create_access_token(
-            data={"sub": current_user.username},
-            expire_delta=access_token_expires
+            data={"sub": current_user.username}, expire_delta=access_token_expires
         )
-        
+
     except Exception as e:
-        
         return {"error": e, "status": 500}
-    
-    return {
-        "access_token": access_token, 
-        "token_type": "bearer", 
-        "status": 200
-    }
+
+    return {"access_token": access_token, "token_type": "bearer", "status": 200}

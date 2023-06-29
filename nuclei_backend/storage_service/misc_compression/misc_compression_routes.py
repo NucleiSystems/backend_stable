@@ -1,4 +1,3 @@
-
 from fastapi import Depends, UploadFile, status
 
 from nuclei_backend.users.auth_utils import get_current_user
@@ -18,7 +17,6 @@ def compress_task_misc(
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
-
     for file in files:
         _file = file.file
         _file = _file.read()

@@ -4,6 +4,7 @@ import urllib.parse
 import uuid
 import time
 
+
 class UserBehavior(TaskSet):
     token = None
     email = None
@@ -32,7 +33,7 @@ class UserBehavior(TaskSet):
             else:
                 response.failure("Failed to register user")
         time.sleep(1)
-    
+
     @task(2)
     def login(self):
         payload = {

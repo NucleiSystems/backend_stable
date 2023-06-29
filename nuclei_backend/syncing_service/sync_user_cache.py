@@ -1,5 +1,4 @@
 import json
-import shutil
 import redis
 import time
 import pathlib
@@ -41,11 +40,10 @@ class RedisController:
 
     def delete_file_count(self):
         return self.redis_connection.delete(f"{self.user}_count")
-    
+
     def close(self):
         return self.redis_connection.quit()
-        
-        
+
 
 class FileCacheEntry:
     """A cache entry for a file in a directory."""
@@ -149,7 +147,7 @@ class FileListener(SchedulerController):
         self.session_id = session_id
 
     def file_listener(self):
-        folder_path = self.path / str(self.session_id)
+        self.path / str(self.session_id)
         time.sleep(2)
         files_index = open(f"{self.session_id}.internal.json", "r").read()
         data = json.loads(files_index)

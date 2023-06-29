@@ -48,7 +48,6 @@ class Chunker:
         """
         _hash = hashlib.sha256()
         with open(self.file_name, "rb") as file:
-
             chunk = 0
             while chunk != b"":
                 chunk = file.read(1024)
@@ -164,7 +163,6 @@ class Reconstruct:
         """  # noqa: E501
         _hash = hashlib.sha256()
         with open(f"reconstructed/{self.file_name}", "rb") as file:
-
             chunk = 0
             while chunk != b"":
                 chunk = file.read(1024)

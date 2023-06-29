@@ -7,13 +7,11 @@ networks:
   traefik-network:
     external: true
   traefik-hub: {}
-  mq-network:
-    driver: bridge
+
   my-network:
     driver: bridge
 
 services:
-
   postgres:
     image: postgres:latest
     environment:
@@ -43,39 +41,8 @@ services:
     cap_add:
       - SYS_ADMIN
 
-  hub-agent:
-    image: ghcr.io/traefik/hub-agent-traefik:v1.1.0
-    pull_policy: always
-    container_name: hub-agent
-    restart: "on-failure"
-    
-    command:
-      - run
-      - --hub.token=a1a13386-d01b-4465-aa68-3d492244649e
-      - --auth-server.advertise-url=http://hub-agent
-      - --traefik.host=traefik
-      - --traefik.tls.insecure=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - traefik-hub
-    depends_on:
-      - traefik
-
-  traefik:
-    image: traefik:v2.9
-    container_name: traefik
-    command:
-      - --experimental.hub=true
-      - --hub.tls.insecure=true
-      - --metrics.prometheus.addrouterslabels=true
-    networks:
-      - traefik-hub
-
   nuclei_backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.app
+    image: ronnytec/nuclei:latest
     expose:
       - 8000
     ports:

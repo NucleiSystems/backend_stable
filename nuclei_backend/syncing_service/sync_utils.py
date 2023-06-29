@@ -1,20 +1,14 @@
 import contextlib
-from functools import total_ordering, lru_cache
 import logging
 import shutil
 import subprocess
 import time
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 import os, pathlib
 
 from ..storage_service.ipfs_model import DataStorage
-from ..users.auth_utils import get_current_user
-from ..users.user_handler_utils import get_db
-from ..users.user_models import User
-from .sync_user_cache import FileListener, RedisController, SchedulerController
 from uuid import uuid4
-from pathlib import Path
 import json
 import contextlib
 

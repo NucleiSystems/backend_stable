@@ -2,9 +2,7 @@ import contextlib
 import json
 
 import time
-from functools import lru_cache, total_ordering
 from fastapi import Depends
-from fastapi_utils.tasks import repeat_every
 from ..storage_service.ipfs_model import DataStorage
 from ..users.auth_utils import get_current_user
 from ..users.user_handler_utils import get_db
@@ -56,6 +54,7 @@ async def dispatch_all(user: User = Depends(get_current_user), db=Depends(get_db
         file_listener.file_listener()
 
         scheduler_controller = SchedulerController()
+
         if scheduler_controller.check_scheduler():
             scheduler_controller.start_scheduler()
 
@@ -93,39 +92,33 @@ async def redis_cache_all(user: User = Depends(get_current_user)):
 
 
 @sync_router.get("/delete/")
-async def delete(image_index:int, user: User = Depends(get_current_user), db=Depends(get_db)):
-    
+async def delete(
+    image_index: int, user: User = Depends(get_current_user), db=Depends(get_db)
+):
     db.query(DataStorage).filter(
-        DataStorage.owner_id == user.id, 
-        DataStorage.id == image_index
+        DataStorage.owner_id == user.id, DataStorage.id == image_index
     ).delete()
-    
+
     _redis = RedisController(str(user.id))
-    
+
     all_files = _redis.get_files()
     all_files = json.loads(all_files)
-    
+
     all_files.pop(image_index)
     _redis.set_files(all_files)
     _redis.close()
     db.commit()
-    
-    return {
-        "status": "deleted",
-        "image_index": image_index
-        
-    }
+
+    return {"status": "deleted", "image_index": image_index}
+
 
 @sync_router.get("/edit/")
 async def delete(user: User = Depends(get_current_user), db=Depends(get_db)):
     #
     #
-    #f
-    
-    return {
-        
-    }
+    # f
 
+    return {}
 
 
 @sync_router.post("/fetch/delete/all")
