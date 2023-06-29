@@ -15,5 +15,5 @@ def create_user(
             "status_code": 400,
             "detail": "User with this email already exists",
         }
-
-    return user_handler_utils.create_user(db=db, user=user)
+    else:
+        return user_handler_utils.create_user(db=db, user=user)
