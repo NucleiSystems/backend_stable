@@ -12,7 +12,7 @@ class CompressImage(CompressionImpl):
     def __init__(self, file: bytes, filename: str):
         super().__init__(app_path="image")
 
-        self.file = (file).encode("utf-8")
+        self.file = file
         self.filename = filename
         self.compression_temp_file = self.save_to_temp(self.file, self.filename)
 
@@ -54,4 +54,4 @@ class CompressImage(CompressionImpl):
         with ProcessPoolExecutor(max_workers=compression_processes) as executor:
             compressed_chunks = executor.map(self.compress_data, chunks)
 
-        return b"".join(list(compressed_chunks))
+        return b"".join(list(compressed_chunks)).encode("utf-8")
