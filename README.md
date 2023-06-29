@@ -1,6 +1,6 @@
 # Nuclei
 
-built using Fastapi and flutter and respective extensions.
+built using Fastapi and Flutter and respective extensions.
 
 Nuclei is a web application that allows you to upload and manage your own compressed media to increase media availability and accessibility.
 
@@ -26,7 +26,7 @@ i will explain in a linear manner on the choices taken to write this app. The ma
 
 To power the backend, we use FastAPI to write the backend.
 
-Python: Python is a very powerful language and due to its simplistic DX it was a simple choice. Python is inheritly "slow" but when paired with uvicorn and a framework which is built on top of the extrememly fast Starlette library.
+Python: Python is a very powerful language and due to its simplistic DX it was a simple choice. Python is inherently "slow" but when paired with uvicorn and a framework that is built on top of the extrememly fast Starlette library.
 
 Postgresql: To store user data, we cannot allow users to depend on local file stores, therefore we use a more elegant solution, with that in mind, the database used is Postgresql, its a simple choice, i didnt use sqlite due to physical database access and saw that as a challange to the security philosophy in mind.
 

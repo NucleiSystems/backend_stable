@@ -12,7 +12,7 @@ class CompressImage(CompressionImpl):
     def __init__(self, file: bytes, filename: str):
         super().__init__(app_path="image")
 
-        self.file = file
+        self.file = (file).encode("utf-8")
         self.filename = filename
         self.compression_temp_file = self.save_to_temp(self.file, self.filename)
 
