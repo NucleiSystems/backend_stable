@@ -21,9 +21,10 @@ from .sync_utils import UserDataExtraction, get_collective_bytes, get_user_cids
 async def dispatch_all(user: User = Depends(get_current_user), db=Depends(get_db)):
     with contextlib.suppress(PermissionError):
         cids = get_user_cids(user.id, db)
+        print(cids)
 
         queried_bytes = get_collective_bytes(user.id, db)
-
+        print(queried_bytes)
         files = UserDataExtraction(user.id, db, cids)
 
         file_session_cache = FileCacheEntry(files.session_id)
