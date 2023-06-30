@@ -5,7 +5,7 @@ from .auth_utils import *  # noqa: F403
 from .main import users_router
 
 
-@users_router.post("/register", response_model=user_handler_utils.user_schemas.User)
+@users_router.post("/register")
 def create_user(
     user: user_handler_utils.user_schemas.UserCreate,
     db: user_handler_utils.Session = Depends(user_handler_utils.get_db),
