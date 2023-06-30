@@ -14,16 +14,19 @@ from .sync_user_cache import (
     RedisController,
     SchedulerController,
 )
-from .sync_utils import UserDataExtraction, get_collective_bytes, get_user_cids
+from .sync_utils import (
+    UserDataExtraction,
+    get_collective_bytes,
+    get_user_cids,
+    get_user_cid,
+)
+import typing
 
 
 @sync_router.get("/fetch/all")
 async def dispatch_all(user: User = Depends(get_current_user), db=Depends(get_db)):
     cids = get_user_cids(user.id, db)
-    print(cids)
-
     queried_bytes = get_collective_bytes(user.id, db)
-    print(queried_bytes)
     files = UserDataExtraction(user.id, db, cids)
 
     file_session_cache = FileCacheEntry(files.session_id)
@@ -77,6 +80,52 @@ async def dispatch_all(user: User = Depends(get_current_user), db=Depends(get_db
     }
 
 
+@sync_router.get("/fetch")
+async def fetch_specific(
+    user: User = Depends(get_current_user),
+    db=Depends(get_db),
+    item_ids: typing.List[int] = None,
+):
+    """
+    Fetches specific files from the IPFS network
+    """
+    if item_ids is None:
+        return {"message": "No item ids provided"}
+
+    for item_id in item_ids:
+        files = UserDataExtraction(user.id, db, [get_user_cid(user.id, db, item_id)])
+        files.download_file_ipfs()
+        files.write_file_summary()
+        files.cleanup()
+
+        file_listener = FileListener(user.id, files.session_id)
+        file_listener.file_listener()
+
+    _redis = RedisController(str(user.id))
+    all_files = _redis.get_files()
+    _redis.close()
+    all_files = json.loads(all_files)
+    files_to_return = []
+    for name, _ in all_files:
+        file_index = (
+            db.query(DataStorage)
+            .filter(DataStorage.owner_id == user.id, DataStorage.file_name == name)
+            .first()
+        )
+        files_to_return.append(file_index.id)
+
+    return {"status": 200, "files": files_to_return}
+
+
+@sync_router.get("/fetch/user_data")
+def get_user_data_length(user: User = Depends(get_current_user), db=Depends(get_db)):
+    return {
+        "user_data_length": len(
+            db.query(DataStorage).filter(DataStorage.owner_id == user.id).all()
+        )
+    }
+
+
 @sync_router.get("/fetch/redis/all")
 async def redis_cache_all(user: User = Depends(get_current_user)):
     try:
@@ -119,15 +168,6 @@ async def delete(user: User = Depends(get_current_user), db=Depends(get_db)):
     # f
 
     return {}
-
-
-@sync_router.get("/fetch/user_data")
-def get_user_data_length(user: User = Depends(get_current_user), db=Depends(get_db)):
-    return {
-        "user_data_length": len(
-            db.query(DataStorage).filter(DataStorage.owner_id == user.id).all()
-        )
-    }
 
 
 @sync_router.post("/fetch/delete/all")
