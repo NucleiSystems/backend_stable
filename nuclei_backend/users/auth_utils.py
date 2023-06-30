@@ -45,7 +45,12 @@ def authenticate_user(
     password: str,
     db: user_handler_utils.Session = Depends(user_handler_utils.get_db),
 ):
+    print(username)
+    print(password)
+
     if user := get_user_by_username(db, username=username):
+        print(user.hashed_password)
+        print(user.username)
         return (
             user
             if user_handler_utils.verify_password(password, user.hashed_password)

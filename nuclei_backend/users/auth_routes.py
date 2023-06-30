@@ -20,6 +20,8 @@ def login_for_access_token(
     db=Depends(user_handler_utils.get_db),
 ):
     print(form_data)
+    print(form_data.username)
+    print(form_data.password)
     user = authenticate_user(
         username=form_data.username,
         password=form_data.password,
