@@ -18,5 +18,6 @@ def create_user(
         }
     try:
         user_handler_utils.create_user(db=db, user=user)
+        return {"status_code": 200, "detail": "User created successfully"}
     except Exception as e:
         return {"status_code": 400, "detail": str(e)}
