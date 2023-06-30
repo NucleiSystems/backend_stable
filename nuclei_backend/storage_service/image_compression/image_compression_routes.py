@@ -50,7 +50,6 @@ import io
 #             futures.append(future)
 
 #         results = [future.result() for future in futures]
-
 #     return results
 
 

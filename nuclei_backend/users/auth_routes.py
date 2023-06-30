@@ -19,18 +19,7 @@ def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db=Depends(user_handler_utils.get_db),
 ):
-    """
-    This function handles user authentication and generates an access token for the user to access
-    protected routes.
-
-    :param form_data: The form data is the data submitted by the user in the login form, which includes
-    the username and password
-    :type form_data: OAuth2PasswordRequestForm
-    :param db: The `db` parameter is a dependency that is used to get a database connection object. It
-    is passed to the function using the `Depends()` function from the `fastapi` library. The `get_db`
-    function from the `user_handler_utils` module is used to get the database connection
-    :return: A dictionary containing an access token and token type.
-    """
+    print(form_data)
     user = authenticate_user(
         username=form_data.username,
         password=form_data.password,

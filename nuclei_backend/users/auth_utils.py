@@ -2,8 +2,6 @@ from datetime import datetime, timedelta, timezone
 
 from typing import Dict, Literal, Union
 
-# The class is a configuration class that contains the secret key, the algorithm, and the access token  # noqa: E501
-# expiration time
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -38,6 +36,7 @@ def create_access_token(
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     data_to_encode.update({"exp": expire})
+
     return jwt.encode(data, UsersConfig.SECRET_KEY, algorithm=UsersConfig.ALGORITHM)
 
 
