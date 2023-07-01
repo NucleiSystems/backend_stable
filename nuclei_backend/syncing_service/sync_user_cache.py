@@ -164,7 +164,7 @@ class FileListener(SchedulerController):
         for _ in data:
             with open(_[0], "rb") as file_read_buffer:
                 file_read_buffer = file_read_buffer.read()
-
+            print(str(_[1]))
             dispatch_dict[str(self.user_id)].append(
                 {
                     str(_[0]): base64.encodebytes(file_read_buffer).decode(),
