@@ -12,7 +12,6 @@ from .sync_user_cache import (
     FileCacheEntry,
     FileListener,
     RedisController,
-    SchedulerController,
 )
 from .sync_utils import (
     UserDataExtraction,
@@ -42,11 +41,6 @@ async def dispatch_all(user: User = Depends(get_current_user), db=Depends(get_db
 
     file_listener = FileListener(user.id, files.session_id)
     file_listener.file_listener()
-
-    scheduler_controller = SchedulerController()
-
-    if scheduler_controller.check_scheduler():
-        scheduler_controller.start_scheduler()
 
     time.sleep(10)
     redis_controller.set_file_count(len(cids))
