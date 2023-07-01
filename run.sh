@@ -1,5 +1,7 @@
 #!/bin/bash
 
+chmod +x /nuclei_backend/storage_service/ipfs
+
 # Start IPFS daemon and log output to ipfs.log
 nohup /nuclei_backend/storage_service/ipfs daemon --init --enable-pubsub-experiment > ipfs.log 2>&1 &
 
