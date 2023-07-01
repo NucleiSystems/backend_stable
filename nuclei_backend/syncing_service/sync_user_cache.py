@@ -139,6 +139,8 @@ class SchedulerController:
         self.scheduler.remove_job(job_id)
 
 
+# The `FileListener` class is a subclass of `SchedulerController` that listens for file changes, reads
+# the files, encodes them in base64, and stores them in a Redis database.
 class FileListener(SchedulerController):
     def __init__(self, user_id, session_id):
         super().__init__()
@@ -147,7 +149,11 @@ class FileListener(SchedulerController):
         self.session_id = session_id
 
     def file_listener(self):
-        self.path / str(self.session_id)
+        """
+        The `file_listener` function reads files from a directory, encodes them in base64, and stores them
+        in a dictionary before saving the dictionary to a Redis database.
+        """
+        # self.path / str(self.session_id)
         time.sleep(2)
         files_index = open(f"{self.session_id}.internal.json", "r").read()
         data = json.loads(files_index)
@@ -160,7 +166,10 @@ class FileListener(SchedulerController):
                 file_read_buffer = file_read_buffer.read()
 
             dispatch_dict[str(self.user_id)].append(
-                {str(_[0]): base64.encodebytes(file_read_buffer).decode()}
+                {
+                    str(_[0]): base64.encodebytes(file_read_buffer).decode(),
+                    "id": str(_[1]),
+                }
             )
         dispatch_dict = str(dispatch_dict).replace("'", '"')
         self.redis.set_files(dispatch_dict)

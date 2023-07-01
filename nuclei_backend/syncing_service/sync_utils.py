@@ -110,6 +110,7 @@ class UserDataExtraction:
                     "file_name": cid.file_name,
                     "file_cid": cid.file_cid,
                     "file_size": cid.file_size,
+                    "file_id": cid.id,
                 }
                 for cid in self.cids
             }
