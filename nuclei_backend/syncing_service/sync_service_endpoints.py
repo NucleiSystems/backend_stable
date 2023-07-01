@@ -33,19 +33,6 @@ async def dispatch_all(user: User = Depends(get_current_user), db=Depends(get_db
 
     redis_controller = RedisController(user=str(user.id))
 
-    if redis_controller.check_files():
-        cached_file_count = redis_controller.get_file_count()
-
-        if cached_file_count == len(cids):
-            return {
-                "message": "Files are already in cache",
-                "cids": cids,
-                "bytes": queried_bytes,
-            }
-
-        else:
-            redis_controller.delete_file_count()
-
     files.download_file_ipfs()
 
     files.write_file_summary()
