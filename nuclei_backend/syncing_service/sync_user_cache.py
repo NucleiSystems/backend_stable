@@ -112,36 +112,9 @@ class FileCacheEntry:
                     ).parent.absolute() / "FILE_PLAYING_FIELD" / f"{dir_id}"
 
 
-class SchedulerController:
-    def __init__(self):
-        self.scheduler = BackgroundScheduler(
-            executors=SchConfig.executors,
-            job_defaults=SchConfig.job_defaults,
-            timezone=SchConfig.timezone,
-        )
-        self.path = pathlib.Path(__file__).parent.absolute() / "FILE_PLAYING_FIELD"
-
-    @lru_cache(maxsize=None)
-    def start_scheduler(self):
-        self.scheduler.start()
-
-    def check_scheduler(self):
-        return self.scheduler.running
-
-    @lru_cache(maxsize=None)
-    def add_job(self, job_id, func, trigger, **kwargs):
-        self.scheduler.add_job(
-            func=func,
-            trigger=trigger,
-            id=job_id,
-            **kwargs,
-        )
-        self.scheduler.remove_job(job_id)
-
-
 # The `FileListener` class is a subclass of `SchedulerController` that listens for file changes, reads
 # the files, encodes them in base64, and stores them in a Redis database.
-class FileListener(SchedulerController):
+class FileListener(RedisController):
     def __init__(self, user_id, session_id):
         super().__init__()
         self.user_id = user_id
@@ -164,7 +137,6 @@ class FileListener(SchedulerController):
         for _ in data:
             with open(_[0], "rb") as file_read_buffer:
                 file_read_buffer = file_read_buffer.read()
-            print(str(_[1]))
             dispatch_dict[str(self.user_id)].append(
                 {
                     str(_[0]): base64.encodebytes(file_read_buffer).decode(),
