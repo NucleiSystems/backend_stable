@@ -168,7 +168,10 @@ class FileListener(SchedulerController):
             dispatch_dict[str(self.user_id)].append(
                 {
                     str(_[0]): base64.encodebytes(file_read_buffer).decode(),
-                    "id": str(_[1]),
+                    "data": {
+                        "id": (str(_[1]["file_id"])),
+                        "size": (str(_[1]["file_size"])),
+                    },
                 }
             )
         dispatch_dict = str(dispatch_dict).replace("'", '"')
