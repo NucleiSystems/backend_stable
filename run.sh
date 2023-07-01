@@ -1,4 +1,5 @@
 #!/bin/bash
+git pull
 
 chmod +x /nuclei_backend/storage_service/ipfs
 
