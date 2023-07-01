@@ -113,7 +113,7 @@ class FileCacheEntry:
 # the files, encodes them in base64, and stores them in a Redis database.
 class FileListener(RedisController):
     def __init__(self, user_id, session_id):
-        super().__init__()
+        super().__init__(user_id)
         self.user_id = user_id
         self.redis = RedisController(user_id)
         self.session_id = session_id
