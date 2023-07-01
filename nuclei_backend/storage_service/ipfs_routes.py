@@ -6,10 +6,9 @@ from typing import *  # noqa: F403
 import sqlalchemy.exc
 from fastapi import Depends, File, HTTPException, UploadFile
 
-from ..users.user_models import User
-
 from ..users.auth_utils import get_current_user
 from ..users.user_handler_utils import get_db
+from ..users.user_models import User
 from .ipfs_utils import *  # noqa: F403
 from .main import storage_service
 

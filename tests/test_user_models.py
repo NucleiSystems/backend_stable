@@ -1,6 +1,8 @@
 import json
-from fastapi.testclient import TestClient
+
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
 from nuclei_backend.users.main import users_router
 
 app = FastAPI()

@@ -1,15 +1,15 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
-from nuclei_backend.users import user_handler_utils
 from jose import JWTError, jwt
 
+from nuclei_backend.users import user_handler_utils
+
 from .auth_utils import authenticate_user, create_access_token, get_current_user
+from .Config import UsersConfig
 from .main import users_router
 from .user_models import User
-from .Config import UsersConfig
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 

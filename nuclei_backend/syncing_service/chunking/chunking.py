@@ -1,6 +1,6 @@
-import uuid
-import os
 import hashlib
+import os
+import uuid
 
 # import the queue class from Python Standard Library
 

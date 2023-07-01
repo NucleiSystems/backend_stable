@@ -1,15 +1,12 @@
-from concurrent.futures import ThreadPoolExecutor
+from typing import List
 
-from fastapi import BackgroundTasks, Depends, HTTPException, UploadFile, status
+from fastapi import Depends, UploadFile, status
 
 from ...users.auth_utils import get_current_user
 from ...users.user_handler_utils import get_db
 from ..ipfs_utils import *
 from ..main import storage_service
 from .image_compression_utils import CompressImage
-from typing import List
-import io
-
 
 # def process_file(
 #     file: bytes, filename: str, ipfs_flag: bool, identity_token: str, db

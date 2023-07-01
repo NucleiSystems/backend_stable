@@ -3,7 +3,6 @@ import pathlib
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from os import environ
 
 path = pathlib.Path(__file__).parent.absolute()
 

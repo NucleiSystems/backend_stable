@@ -10,7 +10,6 @@ from uuid import uuid4
 
 from typing_extensions import LiteralString
 
-
 from .config import Config
 from .ipfs_model import DataStorage
 

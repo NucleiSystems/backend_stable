@@ -1,6 +1,6 @@
 import pathlib
-from typing import Final
 import struct
+from typing import Final
 
 
 # It's a class that defines a bunch of constants

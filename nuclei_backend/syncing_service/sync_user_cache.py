@@ -1,12 +1,9 @@
-import json
-import redis
-import time
-import pathlib
-from apscheduler.schedulers.background import BackgroundScheduler
-from functools import lru_cache
-from .scheduler_config import SchConfig
-from os import environ
 import base64
+import json
+import pathlib
+import time
+
+import redis
 
 
 class RedisController:
