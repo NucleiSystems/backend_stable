@@ -143,5 +143,6 @@ class FileListener(RedisController):
                     },
                 }
             )
+            
         dispatch_dict = str(dispatch_dict).replace("'", '"')
         self.redis.set_files(dispatch_dict)

@@ -2,7 +2,7 @@ import json
 import time
 import typing
 
-from fastapi import Depends
+from fastapi import Depends, WebSocket, WebSocketDisconnect
 
 from ..storage_service.ipfs_model import DataStorage
 from ..users.auth_utils import get_current_user
@@ -16,6 +16,22 @@ from .sync_utils import (
     get_user_cid,
     get_user_cids,
 )
+
+
+@sync_router.websocket("/ws/{user_id}")
+async def progress_websocket(user_id: int, websocket: WebSocket):
+    await websocket.accept()
+
+    try:
+        while True:
+            # Receive message from the client
+            message = await websocket.receive_text()
+
+            # Send response back to the client
+            await websocket.send_text(message)
+
+    except WebSocketDisconnect:
+        print(f"{user_id}: disconnected")
 
 
 @sync_router.get("/fetch/all")

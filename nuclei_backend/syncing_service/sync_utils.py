@@ -8,6 +8,7 @@ import subprocess
 import time
 from uuid import uuid4
 
+
 from fastapi import HTTPException
 
 from ..storage_service.ipfs_model import DataStorage
@@ -23,18 +24,6 @@ def get_user_cids(user_id, db) -> list:
 
 
 def get_user_cid(user_id, db, item_id) -> list:
-    """
-    The function `get_user_cid` retrieves a specific item from the database based on the user ID and
-    item ID.
-
-    :param user_id: The user ID is the unique identifier of the user for whom we want to retrieve the
-    data
-    :param db: The "db" parameter is an instance of a database connection or session object. It is used
-    to interact with the database and execute queries
-    :param item_id: The `item_id` parameter is the unique identifier of the item that the user wants to
-    retrieve from the database
-    :return: a query object.
-    """
     try:
         query = (
             db.query(DataStorage)
@@ -54,6 +43,15 @@ def get_collective_bytes(user_id, db):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Internal Server Error") from e
+
+
+class ProgressWebsocket:
+    def __ini__(self, user_id, client_key):
+        self.user_id = user_id
+        self.client_key = client_key
+
+    def connect(self):
+        ...
 
 
 class UserDataExtraction:
