@@ -88,9 +88,10 @@ async def clear_redis_schedular(user: User = Depends(get_current_user)):
         )
         redis_instance = RedisController(user.id)
         redis_instance.clear_cache()
-    except Exception:
+    except Exception as e:
         logging.error(
             f"there was an error in the clear_redis_schedular \
+                saying {e} \
             at: {str(datetime.datetime.now())}"
         )
 
