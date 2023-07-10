@@ -80,7 +80,7 @@ async def dispatch_all(
 
 
 @sync_router.on_event("startup")
-@repeat_every(60 * 60 * 2)
+@repeat_every(seconds=60 * 60 * 2)
 async def clear_redis_schedular(user: User = Depends(get_current_user)):
     try:
         logging.info(
