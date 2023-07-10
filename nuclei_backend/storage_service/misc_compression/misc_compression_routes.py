@@ -1,5 +1,4 @@
 from fastapi import Depends, UploadFile, status
-
 from nuclei_backend.users.auth_utils import get_current_user
 
 from ...users.user_handler_utils import get_db

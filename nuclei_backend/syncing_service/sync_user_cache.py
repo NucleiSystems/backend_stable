@@ -109,8 +109,6 @@ class FileCacheEntry:
                     ).parent.absolute() / "FILE_PLAYING_FIELD" / f"{dir_id}"
 
 
-# The `FileListener` class is a subclass of `SchedulerController` that listens for file changes, reads
-# the files, encodes them in base64, and stores them in a Redis database.
 class FileListener(RedisController):
     def __init__(self, user_id, session_id):
         super().__init__(user_id)
@@ -120,7 +118,8 @@ class FileListener(RedisController):
 
     def file_listener(self):
         """
-        The `file_listener` function reads files from a directory, encodes them in base64, and stores them
+        The `file_listener` function reads files from a directory,
+        encodes them in base64, and stores them
         in a dictionary before saving the dictionary to a Redis database.
         """
         # self.path / str(self.session_id)
@@ -143,6 +142,6 @@ class FileListener(RedisController):
                     },
                 }
             )
-            
+
         dispatch_dict = str(dispatch_dict).replace("'", '"')
         self.redis.set_files(dispatch_dict)

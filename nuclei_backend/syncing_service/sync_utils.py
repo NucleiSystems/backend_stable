@@ -7,19 +7,29 @@ import shutil
 import subprocess
 import time
 from uuid import uuid4
-
-
+import datetime
 from fastapi import HTTPException
 
 from ..storage_service.ipfs_model import DataStorage
 
 
 def get_user_cids(user_id, db) -> list:
+    logging.info(f"get_user_cids called at: {str(datetime.datetime.now())}")
     try:
+        logging.info(
+            f"queried the data-storage table at: {str(datetime.datetime.now())}"
+        )
         query = db.query(DataStorage).filter(DataStorage.owner_id == user_id).all()
+        logging.info(
+            f"queried the data-storage table at: {str(datetime.datetime.now())}"
+        )
+
         return query
     except Exception as e:
-        logging.error(e)
+        logging.error(
+            f"An Error occured in get_user_cids, error is:{e}"
+            "error occured at: {str(datetime.datetime.now())}"
+        )
         raise HTTPException(status_code=500, detail="Internal Server Error") from e
 
 

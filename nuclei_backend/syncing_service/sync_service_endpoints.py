@@ -1,8 +1,10 @@
 import json
 import time
 import typing
-
-from fastapi import Depends, WebSocket, WebSocketDisconnect
+from fastapi_utils.tasks import repeat_every
+from fastapi import Depends
+from fastapi import BackgroundTasks, status
+from concurrent.futures import ThreadPoolExecutor
 
 from ..storage_service.ipfs_model import DataStorage
 from ..users.auth_utils import get_current_user
@@ -16,61 +18,81 @@ from .sync_utils import (
     get_user_cid,
     get_user_cids,
 )
+import logging
+import datetime
 
 
-@sync_router.websocket("/ws/{user_id}")
-async def progress_websocket(user_id: int, websocket: WebSocket):
-    await websocket.accept()
-
+def process_file(user, db) -> None:
     try:
-        while True:
-            # Receive message from the client
-            message = await websocket.receive_text()
+        cids = get_user_cids(user.id, db)
+        get_collective_bytes(user.id, db)
+        files = UserDataExtraction(user.id, db, cids)
+        file_session_cache = FileCacheEntry(files.session_id)
+        redis_controller = RedisController(user=str(user.id))
+        files.download_file_ipfs()
+        files.write_file_summary()
+        if files.insurance():
+            file_session_cache.activate_file_session()
+        file_listener = FileListener(user.id, files.session_id)
+        file_listener.file_listener()
+        time.sleep(10)
+        redis_controller.set_file_count(len(cids))
 
-            # Send response back to the client
-            await websocket.send_text(message)
+        try:
+            files.cleanup()
+        except Exception as e:
+            print(e)
 
-    except WebSocketDisconnect:
-        print(f"{user_id}: disconnected")
-
-
-@sync_router.get("/fetch/all")
-async def dispatch_all(user: User = Depends(get_current_user), db=Depends(get_db)):
-    cids = get_user_cids(user.id, db)
-    queried_bytes = get_collective_bytes(user.id, db)
-    files = UserDataExtraction(user.id, db, cids)
-
-    file_session_cache = FileCacheEntry(files.session_id)
-
-    redis_controller = RedisController(user=str(user.id))
-
-    files.download_file_ipfs()
-
-    files.write_file_summary()
-
-    if files.insurance():
         file_session_cache.activate_file_session()
 
-    file_listener = FileListener(user.id, files.session_id)
-    file_listener.file_listener()
-
-    time.sleep(10)
-    redis_controller.set_file_count(len(cids))
-
-    try:
-        files.cleanup()
+        redis_controller.close()
     except Exception as e:
         print(e)
 
-    file_session_cache.activate_file_session()
 
-    redis_controller.close()
+def process_files(user, db):
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = []
+        future = executor.submit(process_file, user, db)
+        futures.append(future)
 
-    return {
-        "message": "Dispatched",
-        "cids": cids,
-        "bytes": queried_bytes,
-    }
+        results = [future.result() for future in futures]
+    return results
+
+
+@sync_router.get("/fetch/all")
+async def dispatch_all(
+    background_tasks: BackgroundTasks,
+    user: User = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    try:
+        background_tasks.add_task(process_files, user, db)
+        return {
+            "message": "Dispatched",
+        }, status.HTTP_202_ACCEPTED
+    except Exception as e:
+        return {"error": e}
+
+
+# write a singular endpoint to point traffic
+# to either the redis cache fetcher or to the file fetcher endpoint
+
+
+@sync_router.on_event("startup")
+@repeat_every(60 * 60 * 2)
+async def clear_redis_schedular(user: User = Depends(get_current_user)):
+    try:
+        logging.info(
+            f"deleting {user.username}'s redis cache at: {str(datetime.datetime.now())}"
+        )
+        redis_instance = RedisController(user.id)
+        redis_instance.clear_cache()
+    except Exception:
+        logging.error(
+            f"there was an error in the clear_redis_schedular \
+            at: {str(datetime.datetime.now())}"
+        )
 
 
 @sync_router.get("/fetch")
@@ -152,15 +174,6 @@ async def delete(
     db.commit()
 
     return {"status": "deleted", "image_index": image_index}
-
-
-@sync_router.get("/edit/")
-async def delete(user: User = Depends(get_current_user), db=Depends(get_db)):
-    #
-    #
-    # f
-
-    return {}
 
 
 @sync_router.post("/fetch/delete/all")

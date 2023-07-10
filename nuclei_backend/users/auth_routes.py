@@ -64,7 +64,7 @@ async def verify_token(token: str):
 
 
 @users_router.post("/token/refresh")
-def login_for_access_token(
+def refresh(
     db=Depends(user_handler_utils.get_db),
     current_user: User = Depends(get_current_user),
 ):
