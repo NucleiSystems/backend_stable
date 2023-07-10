@@ -7,6 +7,7 @@ from ...users.auth_utils import get_current_user
 from ...users.user_handler_utils import get_db
 from ..main import storage_service
 from .image_compression_utils import CompressImage
+import logging
 
 
 def process_file(
@@ -37,6 +38,7 @@ def process_files(
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
+    logging.debug("before thread pool executor")
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = []
         for file in files:
@@ -59,12 +61,16 @@ async def compress_task_image(
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
+    logging.debug("1 for debug")
     if not files:
+        logging.debug("not files")
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No file uploaded",
         )
     try:
+        logging.debug("sending the task to background")
         background_tasks.add_task(process_files, files, ipfs_flag, identity_token, db)
 
         return {
