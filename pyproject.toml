@@ -1,29 +1,37 @@
 [tool.poetry]
-name = "nuclei"
-version = "0.3.2"
+name = "daemon-moderans-linux-stable"
+version = "0.1.0"
 description = ""
-authors = ["Wizock <silent.death3500@gmail.com>"]
+authors = ["wizock <silent.death3500@gmail.com>"]
+readme = "README.md"
+packages = [{include = "daemon_moderans_linux_stable"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
+APScheduler = "3.9.1.post1"
+colorama= "0.4.6"
+cryptography= "39.0.1"
+fastapi= "0.94.1"
+httpx= "0.23.0"
+gevent= "22.10.2"
+lz4= "4.3.2"
+passlib= "1.7.4"
+Pillow= "9.4.0"
+pydantic= "1.10.4"
+pytest_cov= "4.0.0"
+python_jose= "3.3.0"
+redis= "4.4.0"
+SQLAlchemy= "1.4.46"
+starlette= "0.26.1"
+typing_extensions= "4.4.0"
+uvicorn= "0.20.0"
+itsdangerous= "2.1.2"
+psycopg2-binary= "2.9.5"
+pycrypto= "2.6.1"
 
-[tool.poetry.dev-dependencies]
-ffmpeg="1.4"
-fastapi="0.79.0"
-ffmpeg_python="0.2.0"
-gevent="21.12.0"
-httpx="0.23.0"
-jose="1.0.0"
-lz4="4.0.1"
-passlib="1.7.4"
-Pillow="9.3.0"
-pydantic="1.9.1"
-python_jose="3.3.0"
-SQLAlchemy="1.4.35"
-PyJWT="2.4.0"
-tqdm="4.64.0"
-typing_extensions="4.3.0"
+
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+pip install 
