@@ -81,8 +81,9 @@ async def dispatch_all(
 
 @sync_router.on_event("startup")
 @repeat_every(seconds=60 * 60 * 2)
-async def clear_redis_schedular(user: User = Depends(get_current_user)):
+async def clear_redis_schedular():
     try:
+        user: User = get_current_user()
         logging.info(
             f"deleting {user.username}'s redis cache at: {str(datetime.datetime.now())}"
         )
