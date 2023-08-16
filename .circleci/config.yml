@@ -17,13 +17,9 @@ jobs:
         - image: python:latest
         steps:
           - checkout
-          - add_ssh_keys:
-              fingerprints:
-                - "SHA256:oUp8hqCYTQ+JYW2mbuYp9oM2/KJaf3dyLP/8Nka6oIs Rohaanerodasahmed@gmail.com"
           - run:
               name: Deploy Over SSH
-              command: |
-                ssh -o StrictHostKeyChecking=no root@170.64.180.130 'systemctl restart nuclei_backend.service'
+              command: "../commit_action.sh"
 
 
 workflows:
