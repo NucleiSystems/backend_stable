@@ -16,14 +16,15 @@ jobs:
         docker:
         - image: python:latest
         steps:
-        - checkout
-        - add_ssh_keys
-        - run:
-            name: Deploy Over SSH
-            command: |
-              ssh root@170.64.180.130 
-              ssh -o StrictHostKeyChecking=no 
-              systemctl restart nuclei_backend.service
+          - checkout
+          - add_ssh_keys:
+              fingerprints:
+                - "SHA256:oUp8hqCYTQ+JYW2mbuYp9oM2/KJaf3dyLP/8Nka6oIs Rohaanerodasahmed@gmail.com"
+          - run:
+              name: Deploy Over SSH
+              command: |
+                ssh -o StrictHostKeyChecking=no root@170.64.180.130 'systemctl restart nuclei_backend.service'
+
 
 workflows:
   build-and-deploy:
