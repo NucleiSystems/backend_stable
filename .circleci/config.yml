@@ -19,7 +19,7 @@ jobs:
           - checkout
           - run:
               name: Deploy Over SSH
-              command: "../commit_action.sh"
+              command: "./commit_action.sh"
 
 
 workflows:
