@@ -9,4 +9,4 @@ VPS_SSH_KEY_PATH="./id_rsa"
 SERVICE_NAME="nuclei_backend.service"
 
 # SSH into the VPS and restart the service
-ssh -i "$VPS_SSH_KEY_PATH" "$VPS_USER@$VPS_HOST" "sudo systemctl restart $SERVICE_NAME"
+ssh -o StrictHostKeyChecking=no -i "$VPS_SSH_KEY_PATH" "$VPS_USER@$VPS_HOST" "sudo systemctl restart $SERVICE_NAME"
