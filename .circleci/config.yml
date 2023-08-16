@@ -19,7 +19,7 @@ jobs:
         - checkout
         - run:
             name: Deploy Over SSH
-            command: sshpass -p 'ronny' ssh root@170.64.180.130 'systemctl restart nuclei_backend.service'
+            command: ssh -i /root/.ssh/id_rsa root@170.64.180.130 'systemctl restart nuclei_backend.service'
 
 workflows:
   build-and-deploy:
