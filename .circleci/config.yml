@@ -20,7 +20,10 @@ jobs:
         - add_ssh_keys
         - run:
             name: Deploy Over SSH
-            command: ssh -o StrictHostKeyChecking=no \ root@170.64.180.130; 'systemctl restart nuclei_backend.service'
+            command: |
+              ssh root@170.64.180.130 
+              ssh -o StrictHostKeyChecking=no 
+              systemctl restart nuclei_backend.service
 
 workflows:
   build-and-deploy:
