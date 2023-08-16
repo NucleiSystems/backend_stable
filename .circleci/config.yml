@@ -11,7 +11,7 @@ jobs:
         - run:
             name: Install Dependencies
             command: pip install -r requirements.txt
-        parallelism: 4
+        parallelism: 10
 
     deploy:
         docker:
@@ -21,6 +21,9 @@ jobs:
           - run:
               name: Set execute permission for commit_action.sh
               command: chmod +x commit_action.sh
+          - run:
+              name: Set permissions for private key
+              command: chmod 600 ./id_rsa
           - run:
               name: Deploy Over SSH
               command: "./commit_action.sh"
