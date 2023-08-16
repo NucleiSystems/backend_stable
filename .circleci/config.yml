@@ -1,0 +1,33 @@
+version: 2.1
+orbs:
+  python: circleci/python@2.0.3
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8.17
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: pip install -r requirements.txt
+
+  deploy:
+    executor: python/default
+    steps:
+      - attach_workspace:
+          at: /workspace
+      - run:
+          name: Deploy Over SSH
+          command: ssh -i /path/to/your/private/key root@170.64.180.130 'systemctl restart nuclei_backend.service'
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build # only deploy once build job has completed
+          filters:
+            branches:
+              only: main # only deploy on the main branch
