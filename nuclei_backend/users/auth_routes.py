@@ -19,20 +19,17 @@ def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db=Depends(user_handler_utils.get_db),
 ):
-    print(form_data)
-    print(form_data.username)
-    print(form_data.password)
     user = authenticate_user(
         username=form_data.username,
         password=form_data.password,
         db=db,
     )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    # if not user:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Incorrect username or password",
+    #         headers={"WWW-Authenticate": "Bearer"},
+    #     )
     access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
         data={"sub": user.username},
