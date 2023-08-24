@@ -1,3 +1,4 @@
+import hashlib
 import json
 import time
 import typing
@@ -103,33 +104,56 @@ async def fetch_specific(
     db=Depends(get_db),
     item_ids: typing.List[int] = None,
 ):
-    """
-    Fetches specific files from the IPFS network
-    """
     if item_ids is None:
         return {"message": "No item ids provided"}
-
-    for item_id in item_ids:
-        files = UserDataExtraction(user.id, db, [get_user_cid(user.id, db, item_id)])
-        files.download_file_ipfs()
-        files.write_file_summary()
-        files.cleanup()
-
-        file_listener = FileListener(user.id, files.session_id)
-        file_listener.file_listener()
 
     _redis = RedisController(str(user.id))
     all_files = _redis.get_files()
     _redis.close()
     all_files = json.loads(all_files)
+
     files_to_return = []
-    for name, _ in all_files:
+
+    for item_id in item_ids:
+        files = UserDataExtraction(user.id, db, [get_user_cid(user.id, db, item_id)])
+        files.download_file_ipfs()
+        files.write_file_summary()
+
+        # Validate checksum
+        expected_checksum = None
+        for name, file_data in all_files.items():
+            if (
+                file_data["file_name"] == files.file_name
+            ):  # Adjust based on your data structure
+                expected_checksum = file_data["checksum"]
+                break
+
+        if expected_checksum is None:
+            print("Expected checksum not found for", files.file_name)
+            continue
+
+        calculated_checksum = hashlib.sha256(files.file_data).hexdigest()
+        checksum_match = calculated_checksum == expected_checksum
+
+        files.cleanup()
+
+        file_listener = FileListener(user.id, files.session_id)
+        file_listener.file_listener()
+
         file_index = (
             db.query(DataStorage)
-            .filter(DataStorage.owner_id == user.id, DataStorage.file_name == name)
+            .filter(
+                DataStorage.owner_id == user.id,
+                DataStorage.file_name == files.file_name,
+            )
             .first()
         )
-        files_to_return.append(file_index.id)
+        files_to_return.append(
+            {
+                "file_id": file_index.id,
+                "checksum_match": checksum_match,
+            }
+        )
 
     return {"status": 200, "files": files_to_return}
 
