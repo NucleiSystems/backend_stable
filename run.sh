@@ -1,6 +1,10 @@
 #!/bin/bash
 git pull
 
+pip3 install -r requirements.txt
+uuid=$(uuidgen)
+alembic revision --autogenerate -m "$uuid"
+
 chmod +x /home/backend_stable/nuclei_backend/storage_service/ipfs
 
 # Start IPFS daemon and log output to ipfs.log
