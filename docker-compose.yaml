@@ -4,10 +4,6 @@ volumes:
   data:
 
 networks:
-  traefik-network:
-    external: true
-  traefik-hub: {}
-
   my-network:
     driver: bridge
 
@@ -21,7 +17,6 @@ services:
     volumes:
       - data:/var/lib/postgresql
     networks:
-      - traefik-hub
       - my-network
     restart: always
 
@@ -34,7 +29,6 @@ services:
       - 6379:6379
       - target: 6379
     networks:
-      - traefik-hub
       - my-network
     restart: always
     privileged: true
@@ -61,5 +55,4 @@ services:
     volumes:
       - data:/app/data
     networks:
-      - traefik-hub
       - my-network

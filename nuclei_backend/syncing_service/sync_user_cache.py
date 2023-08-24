@@ -3,14 +3,15 @@ import hashlib
 import json
 import pathlib
 import time
-
+from os import environ
 import redis
 
 
 class RedisController:
     def __init__(self, user):
+        "redis://127.0.0.1:6379"
         self.redis_connection = redis.Redis().from_url(
-            url="redis://127.0.0.1:6379", decode_responses=True, db=0
+            url=environ.get("REDIS_URL"), decode_responses=True, db=0
         )
         self.user = user
 
@@ -50,7 +51,7 @@ class FileCacheEntry:
         """Create a new file cache entry for the specified directory."""
         self.dir_id = dir_id
         self.redis_connection = redis.Redis().from_url(
-            url="redis://127.0.0.1:6379", decode_responses=True, db=1
+            url=environ.get("REDIS_URL"), decode_responses=True, db=1
         )
 
     def activate_file_session(self):
