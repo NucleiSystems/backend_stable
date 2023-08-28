@@ -15,7 +15,7 @@ from .main import storage_service
 
 @storage_service.post("/upload")
 async def upload(
-    file_name: UploadFile = File(),
+    file_name: UploadFile,
     db=Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

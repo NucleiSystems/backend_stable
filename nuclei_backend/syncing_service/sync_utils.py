@@ -14,15 +14,8 @@ from ..storage_service.ipfs_model import DataStorage
 
 
 def get_user_cids(user_id, db) -> list:
-    logging.info(f"get_user_cids called at: {str(datetime.datetime.now())}")
     try:
-        logging.info(
-            f"queried the data-storage table at: {str(datetime.datetime.now())}"
-        )
         query = db.query(DataStorage).filter(DataStorage.owner_id == user_id).all()
-        logging.info(
-            f"queried the data-storage table at: {str(datetime.datetime.now())}"
-        )
 
         return query
     except Exception as e:
@@ -53,15 +46,6 @@ def get_collective_bytes(user_id, db):
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Internal Server Error") from e
-
-
-class ProgressWebsocket:
-    def __ini__(self, user_id, client_key):
-        self.user_id = user_id
-        self.client_key = client_key
-
-    def connect(self):
-        ...
 
 
 class UserDataExtraction:

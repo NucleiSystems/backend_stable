@@ -13,7 +13,8 @@ pydantic==1.10.4
 gevent==22.10.2
 colorama==0.4.6
 starlette>=0.14.2
-fastapi==0.68.0 # Update version to a compatible one
+fastapi==0.94.1
+# Update version to a compatible one
 uvicorn==0.15.0  # Update version to a compatible one
 pycryptodome==3.10.1  # Update package name and version
 passlib==1.7.4
