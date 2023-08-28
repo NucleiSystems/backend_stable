@@ -1,19 +1,23 @@
 #!/bin/bash
-git pull
 
-python -m venv venv
+# Pull the latest changes from the remote repository
+git fetch origin
+git reset --hard origin/master
+
+# Activate the virtual environment
 source venv/bin/activate
 
-pip3 install -r requirements.txt
+# Install or upgrade required packages
+pip3 install --upgrade -r requirements.txt
 
-uuid=$(uuidgen)
+# Generate a new Alembic revision
+alembic revision --autogenerate -m "$(uuidgen)"
 
-alembic revision --autogenerate -m "$uuid"
-
+# Ensure execute permission for IPFS binary
 chmod +x /home/backend_stable/nuclei_backend/storage_service/ipfs
 
 # Start IPFS daemon and log output to ipfs.log
 nohup /nuclei_backend/storage_service/ipfs daemon --init --enable-pubsub-experiment > ipfs.log 2>&1 &
 
 # Start Uvicorn server
-uvicorn nuclei_backend:app --host=0.0.0.0 --port=8000 --workers=4
+uvicorn nuclei_backend:app --host=0.0.0.0 --port=8000
