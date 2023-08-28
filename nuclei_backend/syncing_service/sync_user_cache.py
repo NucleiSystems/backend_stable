@@ -2,7 +2,9 @@ import base64
 import datetime
 import hashlib
 import json
+import os
 import pathlib
+import shutil
 import time
 from os import environ
 import redis
@@ -105,9 +107,21 @@ class FileCleanerSchedule:
                 / "FILE_PLAYING_FIELD"
                 / dir_name
             )
+
             if dir_path.is_dir():
-                dir_path.rmdir()
+                shutil.rmtree(dir_path, ignore_errors=True)
+                print(f"Directory '{dir_path}' and its contents forcefully removed.")
+            else:
+                print(f"Directory '{dir_path}' does not exist.")
             self.redis_connection.delete(sessions)
+        # now we scan the dirs and delete everything else that's not in the redis cache
+
+        other_folders = os.listdir(
+            pathlib.Path(__file__).parent.absolute() / "FILE_PLAYING_FIELD"
+        )
+        for folders in other_folders:
+            if folders not in self.all_sessions:
+                shutil.rmtree(folders, ignore_errors=True)
 
 
 class FileListener(RedisController):
