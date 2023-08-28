@@ -15,6 +15,8 @@ alembic revision --autogenerate -m "$(uuidgen)"
 
 # Ensure execute permission for IPFS binary
 chmod +x /home/backend_stable/nuclei_backend/storage_service/ipfs
+chmod +x /home/backend_stable/nuclei_backend/syncing_service/utils/ipfs
+
 
 # Start IPFS daemon and log output to ipfs.log
 nohup /nuclei_backend/storage_service/ipfs daemon --init --enable-pubsub-experiment > ipfs.log 2>&1 &
