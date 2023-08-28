@@ -1,8 +1,13 @@
 #!/bin/bash
 git pull
 
+python -m venv venv
+source venv/bin/activate
+
 pip3 install -r requirements.txt
+
 uuid=$(uuidgen)
+
 alembic revision --autogenerate -m "$uuid"
 
 chmod +x /home/backend_stable/nuclei_backend/storage_service/ipfs
@@ -11,4 +16,4 @@ chmod +x /home/backend_stable/nuclei_backend/storage_service/ipfs
 nohup /nuclei_backend/storage_service/ipfs daemon --init --enable-pubsub-experiment > ipfs.log 2>&1 &
 
 # Start Uvicorn server
-uvicorn nuclei_backend:app --host=0.0.0.0 --port=8000 #--workers=4
+uvicorn nuclei_backend:app --host=0.0.0.0 --port=8000 --workers=4
