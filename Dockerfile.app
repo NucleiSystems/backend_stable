@@ -1,4 +1,4 @@
-FROM python:3.11-rc-slim-bullseye
+FROM python:3.12.0rc2-slim
 
 RUN apt-get update && apt-get install -y \
     build-essential \
