@@ -1,0 +1,48 @@
+version: 2.1
+orbs:
+  python: circleci/python@2.0.3
+
+jobs:
+    build:
+        docker:
+        - image: python:latest
+        steps:
+        - checkout
+        - run:
+            name: Install Virtual Environment
+            command: |
+              python -m venv venv
+              source venv/bin/activate
+              pip install --upgrade pip
+
+        - run:
+            name: Install Dependencies
+            command: pip install -r requirements.txt
+        parallelism: 10
+
+    deploy:
+        docker:
+        - image: python:latest
+        steps:
+          - checkout
+          - run:
+              name: Set execute permission for commit_action.sh
+              command: chmod +x commit_action.sh
+          - run:
+              name: Set permissions for private key
+              command: chmod 600 ./id_rsa
+          - run:
+              name: Deploy Over SSH
+              command: "./commit_action.sh"
+
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build # only deploy once build job has completed
+          filters:
+            branches:
+              only: master # only deploy on the main branch

@@ -1,5 +1,7 @@
 # Nuclei
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/NucleiSystems/backend_stable/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/NucleiSystems/backend_stable/tree/master)
+
 built using Fastapi and Flutter and respective extensions.
 
 Nuclei is a web application that allows you to upload and manage your own compressed media to increase media availability and accessibility.

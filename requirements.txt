@@ -1,4 +1,5 @@
 APScheduler==3.9.1.post1
+<<<<<<< HEAD
 colorama==0.4.6
 cryptography==39.0.1
 fastapi==0.94.1
@@ -24,3 +25,32 @@ psutil == 5.8.0
 celery == 5.2.2
 numpy == 1.21.4
 ruff 
+=======
+typing-extensions==4.7.1
+python-multipart==0.0.6
+psycopg2-binary==2.9.5
+cryptography==41.0.3
+fastapi-utils==0.2.0
+itsdangerous==2.1.2
+python-jose==3.3.0
+SQLAlchemy==1.4.46
+pytest-cov==3.0.0  # Update version to a compatible one
+zstandard==0.15.2
+pydantic==1.10.4
+gevent==22.10.2
+colorama==0.4.6
+starlette>=0.14.2
+fastapi==0.94.1
+# Update version to a compatible one
+uvicorn==0.15.0  # Update version to a compatible one
+pycryptodome==3.10.1  # Update package name and version
+passlib==1.7.4
+Pillow==9.4.0
+psutil==5.8.0
+celery==5.2.2
+numpy==1.23.2  # Update version to a compatible one
+httpx==0.19.0  # Update version to a compatible one
+redis==3.5.3  # Update version to a compatible one
+lz4==3.1.3  # Update version to a compatible one
+alembic==1.11.3
+>>>>>>> 4d4231be92c4133e6358952488e57608f98a9465

@@ -18,13 +18,13 @@ def process_file(
 
         print("files compressed")
         compressed_file = compressing_file.produce_compression()
-        print(compressed_file)
         if ipfs_flag:
             print("before ipfs flag")
             try:
-                compressing_file.commit_to_ipfs(
-                    compressed_file, filename, identity_token, db
-                )
+                with db as _db:
+                    compressing_file.commit_to_ipfs(
+                        compressed_file, filename, identity_token, _db
+                    )
             except Exception as e:
                 print(f"the error was {e}")
         compressing_file.cleanup_compression_outcome()
@@ -61,10 +61,7 @@ async def compress_task_image(
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
-    logging.debug("1 for debug")
     if not files:
-        logging.debug("not files")
-
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No file uploaded",

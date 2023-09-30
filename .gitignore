@@ -56,7 +56,6 @@ node_modules
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-nuclei_backend/syncing_service/FILE_PLAYING_FIELD/
 # Unit test / coverage reports
 htmlcov/
 .tox/

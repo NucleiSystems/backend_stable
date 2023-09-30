@@ -1,0 +1,109 @@
+Folder PATH listing for volume Windows
+Volume serial number is 165C-21C8
+C:\USERS\RONNY\DESKTOP\BACKEND_STABLE
+¦   .gitignore
+¦   CODE_OF_CONDUCT.md
+¦   commit_action.sh
+¦   config.yml
+¦   Contributing.md
+¦   docker-compose.yaml
+¦   docker-refresher.py
+¦   Dockerfile.app
+¦   dummy_test.py
+¦   id_rsa
+¦   LICENSE
+¦   locustfile.py
+¦   main.py
+¦   opensource-piviot.md
+¦   README.md
+¦   redis.conf
+¦   requirements.txt
+¦   restart.cmd
+¦   run.sh
+¦   SECURITY.md
+¦   sysctl.conf
+¦   tree.txt
+¦   
++---.circleci
+¦       config.yml
+¦       
++---.github
+¦   ¦   dependabot.yml
+¦   ¦   
+¦   +---workflows
+¦           apisec-scan.yml
+¦           bandit.yml
+¦           codacy.yml
+¦           codeql.yml
+¦           crda.yml
+¦           devskim.yml
+¦           ethicalcheck.yml
+¦           jekyll-gh-pages.yml
+¦           neuralegion.yml
+¦           pyre.yml
+¦           python-app.yml
+¦           
++---letsencrypt
+¦       acme.json
+¦       
++---nuclei_backend
+    ¦   Config.py
+    ¦   __init__.py
+    ¦   
+    +---database
+    ¦       __init__.py
+    ¦       
+    +---storage_service
+    ¦   ¦   CompressionBase.py
+    ¦   ¦   config.py
+    ¦   ¦   ipfs
+    ¦   ¦   ipfs_model.py
+    ¦   ¦   ipfs_routes.py
+    ¦   ¦   ipfs_schema.py
+    ¦   ¦   ipfs_utils.py
+    ¦   ¦   main.py
+    ¦   ¦   __init__.py
+    ¦   ¦   
+    ¦   +---image_compression
+    ¦   ¦       celeryconfig.py
+    ¦   ¦       image_compression_routes.py
+    ¦   ¦       image_compression_utils.py
+    ¦   ¦       __init__.py
+    ¦   ¦       
+    ¦   +---misc_compression
+    ¦           data_modifiers.py
+    ¦           misc_compression_routes.py
+    ¦           misc_compression_utils.py
+    ¦           __init__.py
+    ¦           
+    +---syncing_service
+    ¦   ¦   scheduler_config.py
+    ¦   ¦   sync_service_endpoints.py
+    ¦   ¦   sync_service_main.py
+    ¦   ¦   sync_user_cache.py
+    ¦   ¦   sync_utils.py
+    ¦   ¦   __init__.py
+    ¦   ¦   
+    ¦   +---chunking
+    ¦   ¦       chunking.py
+    ¦   ¦       utils.py
+    ¦   ¦       
+    ¦   +---utils
+    ¦           bytes_utils.py
+    ¦           ipfs
+    ¦           quick_sort.py
+    ¦           socket_connection.py
+    ¦           
+    +---users
+    ¦       auth_routes.py
+    ¦       auth_utils.py
+    ¦       Config.py
+    ¦       main.py
+    ¦       user_handler.py
+    ¦       user_handler_utils.py
+    ¦       user_models.py
+    ¦       user_schemas.py
+    ¦       
+    +---user_quota
+            quota_models.py
+            

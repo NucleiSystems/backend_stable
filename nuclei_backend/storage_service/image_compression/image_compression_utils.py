@@ -3,8 +3,7 @@ import pathlib
 import psutil
 from concurrent.futures import ProcessPoolExecutor
 import os
-import numpy as np
-import zstandard as zstd
+import zlib
 
 from ..CompressionBase import CompressionImpl
 
@@ -28,8 +27,7 @@ class CompressImage(CompressionImpl):
             original_data = f.read()
 
         try:
-            compressor = zstd.ZstdCompressor(level=15)
-            return compressor.compress(original_data)
+            return zlib.compress(original_data)
         except Exception as e:
             print(f"Error compressing image: {str(e)}")
             return b""

@@ -1,8 +1,12 @@
 import base64
+import datetime
+import hashlib
 import json
+import os
 import pathlib
+import shutil
 import time
-
+from os import environ
 import redis
 
 
@@ -39,10 +43,10 @@ class RedisController:
         return self.redis_connection.delete(f"{self.user}_count")
 
     def close(self):
-        return self.redis_connection.quit()
+        return self.redis_connection.close()
 
 
-class FileCacheEntry:
+class FileSessionManager:
     """A cache entry for a file in a directory."""
 
     def __init__(self, dir_id):
@@ -51,62 +55,73 @@ class FileCacheEntry:
         self.redis_connection = redis.Redis().from_url(
             url="redis://127.0.0.1:6379", decode_responses=True, db=1
         )
+        self.time_delta = datetime.timedelta(seconds=30)
+        self.time_now = time.time()
 
     def activate_file_session(self):
-        """Activate the file session for this cache entry."""
-        self.redis_connection.set(f"file_session_cache&{str(self.dir_id)}", "active")
+        """
+        'processing:ebd69047-cd6d-4a10-a769-f5f810e4071e':169111333.1111111
+        """
         self.redis_connection.set(
-            f"file_session_cache_activetime&{str(self.dir_id)}", f"{time.ctime()}"
+            f"processing:{self.dir_id}", self.time_delta.seconds + self.time_now
         )
-        return "activated"
 
     def deactivate_file_session(self):
-        """Deactivate the file session for this cache entry."""
-        self.redis_connection.set(
-            f"file_session_cache_id&{str(self.dir_id)}", "notactive"
+        if self.redis_connection.exists(f"processing:{self.dir_id}"):
+            self.redis_connection.delete(f"processing:{self.dir_id}")
+
+    def close(self):
+        return self.redis_connection.close()
+
+
+class FileCleanerSchedule:
+    def __init__(self) -> None:
+        self.redis_connection = redis.Redis().from_url(
+            url="redis://127.0.0.1:6379", decode_responses=True, db=1
         )
-        self.redis_connection.set(
-            f"file_session_cache_deactivetime&{str(self.dir_id)}", f"{time.ctime()}"
+        self.all_sessions = [
+            keys for keys in self.redis_connection.scan_iter("processing:*")
+        ]
+
+    def get_expired_sessions(self):
+        "returns an array of expired keys"
+        for sessions in self.all_sessions:
+            if not self.is_expired(self.redis_connection.get(sessions)):
+                self.all_sessions.remove(sessions)
+        return self.all_sessions
+
+    def is_expired(self, _time):
+        "calculates the time_delta fed"
+        if float(_time) < time.time():
+            return True
+        else:
+            return False
+
+    def clean_expired_folders(self):
+        "checks and deletes expired folders, assumption is the folder is already expired"
+        for sessions in self.get_expired_sessions():
+            dir_name = str(sessions).split(":")[1]
+
+            dir_path = (
+                pathlib.Path(__file__).parent.absolute()
+                / "FILE_PLAYING_FIELD"
+                / dir_name
+            )
+
+            if dir_path.is_dir():
+                shutil.rmtree(dir_path, ignore_errors=True)
+                print(f"Directory '{dir_path}' and its contents forcefully removed.")
+            else:
+                print(f"Directory '{dir_path}' does not exist.")
+            self.redis_connection.delete(sessions)
+        # now we scan the dirs and delete everything else that's not in the redis cache
+
+        other_folders = os.listdir(
+            pathlib.Path(__file__).parent.absolute() / "FILE_PLAYING_FIELD"
         )
-        return "deactivated"
-
-    def _deactivate_file_session(
-        self, cache_id_key, status_value, cache_time_key, time_value
-    ):
-        """Helper method to deactivate a file session."""
-        self.redis_connection.set(f"{cache_id_key}{str(self.dir_id)}", status_value)
-        self.redis_connection.set(f"{cache_time_key}{str(self.dir_id)}", time_value)
-        return "deactivated"
-
-    @classmethod
-    def check_and_delete_files(cls):
-        for key in cls.redis_connection.scan_iter(match="file_session_cache_id&*"):
-            status = cls.redis_connection.get(key)
-            if status == b"notactive":
-                dir_id = key.split("&")[1]
-                deactivated_time = cls.redis_connection.get(
-                    f"file_session_cache_deactivetime&{dir_id}"
-                )
-                if (
-                    time.time() - time.mktime(time.strptime(deactivated_time, "%c"))
-                    >= 3600
-                ):
-                    pathlib.Path.unlink(
-                        __file__
-                    ).parent.absolute() / "FILE_PLAYING_FIELD" / f"{dir_id}"
-
-            elif status == b"active":
-                dir_id = key.split("&")[1]
-                activated_time = cls.redis_connection.get(
-                    f"file_session_cache_activetime&{dir_id}"
-                )
-                if (
-                    time.time() - time.mktime(time.strptime(activated_time, "%c"))
-                    >= 3600
-                ):
-                    pathlib.Path.unlink(
-                        __file__
-                    ).parent.absolute() / "FILE_PLAYING_FIELD" / f"{dir_id}"
+        for folders in other_folders:
+            if folders not in self.all_sessions:
+                shutil.rmtree(folders, ignore_errors=True)
 
 
 class FileListener(RedisController):

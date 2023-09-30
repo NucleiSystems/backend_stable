@@ -1,15 +1,15 @@
-from datetime import datetime, timedelta
+from datetime import timedelta, datetime
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
 
 from nuclei_backend.users import user_handler_utils
+from jose import JWTError, jwt
 
 from .auth_utils import authenticate_user, create_access_token, get_current_user
-from .Config import UsersConfig
 from .main import users_router
 from .user_models import User
+from .Config import UsersConfig
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 
@@ -64,7 +64,7 @@ async def verify_token(token: str):
 
 
 @users_router.post("/token/refresh")
-def refresh(
+def login_for_access_token(
     db=Depends(user_handler_utils.get_db),
     current_user: User = Depends(get_current_user),
 ):
