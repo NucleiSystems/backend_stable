@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Pull the latest changes from the remote repository
-git fetch origin
-git reset --hard origin/master
+
+
 
 # Activate the virtual environment
 source venv/bin/activate
@@ -11,7 +11,7 @@ source venv/bin/activate
 pip3 install --upgrade -r requirements.txt
 
 # Generate a new Alembic revision
-alembic revision --autogenerate -m "$(uuidgen)"
+
 
 # Ensure execute permission for IPFS binary
 chmod +x /home/backend_stable/nuclei_backend/storage_service/ipfs
