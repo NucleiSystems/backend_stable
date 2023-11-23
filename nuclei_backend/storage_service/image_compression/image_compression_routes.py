@@ -38,19 +38,10 @@ def process_files(
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
-    logging.debug("before thread pool executor")
-    with ThreadPoolExecutor(max_workers=8) as executor:
-        futures = []
-        for file in files:
-            _filename = file.filename.replace(" ", "_")
-            _file = file.file.read()  # Read the file contents as bytes
-            future = executor.submit(
-                process_file, _file, _filename, ipfs_flag, identity_token, db
-            )
-            futures.append(future)
-
-        results = [future.result() for future in futures]
-    return results
+    for file in files:
+        _filename = file.filename.replace(" ", "_")
+        _file = file.file.read()  # Read the file contents as bytes
+        process_file(_file, _filename, ipfs_flag, identity_token, db)
 
 
 @storage_service.post("/compress/image")
