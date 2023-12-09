@@ -29,6 +29,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     auth_data = relationship("AuthData", back_populates="user")
+    data = relationship("DataStorage", back_populates="owner")
 
 
 class UserCreate(BaseModel):
