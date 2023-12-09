@@ -40,7 +40,7 @@ def process_files(
 ):
     for file in files:
         _filename = file.filename.replace(" ", "_")
-        _file = file.file.read()  # Read the file contents as bytes
+        _file = file.file.read()
         process_file(_file, _filename, ipfs_flag, identity_token, db)
 
 

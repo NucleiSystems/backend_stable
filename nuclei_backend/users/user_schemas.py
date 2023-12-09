@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel
 
 
@@ -16,3 +17,16 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: Literal["bearer"]
+
+
+class OTPSetupRequest(BaseModel):
+    otp_secret_key: str

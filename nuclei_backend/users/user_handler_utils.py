@@ -1,4 +1,5 @@
 from email.utils import parseaddr
+from uuid import UUID
 
 from fastapi import HTTPException
 from passlib.context import CryptContext
@@ -53,6 +54,14 @@ def create_user(db: Session, user: user_schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def create_auth_data(db: Session, user_id: str, otp_secret_key: str):
+    auth_data = user_models.AuthData(otp_secret_key=otp_secret_key, user_id=user_id)
+    db.add(auth_data)
+    db.commit()
+    db.refresh(auth_data)
+    return auth_data
 
 
 def get_db():

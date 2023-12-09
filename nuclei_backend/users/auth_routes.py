@@ -8,10 +8,42 @@ from jose import JWTError, jwt
 
 from .auth_utils import authenticate_user, create_access_token, get_current_user
 from .main import users_router
-from .user_models import User
+from .user_models import User, AuthData
 from .Config import UsersConfig
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
+
+
+from fastapi.responses import JSONResponse
+import pyotp
+import qrcode
+from io import BytesIO
+
+
+@users_router.post("/register")
+def create_user(
+    user: user_handler_utils.user_schemas.UserCreate = Depends(),
+    db: user_handler_utils.Session = Depends(user_handler_utils.get_db),
+):
+    print(user)
+
+    if db_user := user_handler_utils.get_user_by_username(db, username=user.username):
+        return {
+            "status_code": 400,
+            "detail": "User with this email already exists",
+            "user": db_user,
+        }
+
+    try:
+        db_user = user_handler_utils.create_user(db=db, user=user)
+        otp_secret_key = pyotp.random_base32()
+        user_handler_utils.create_auth_data(
+            db=db, user_id=db_user.id, otp_secret_key=otp_secret_key
+        )
+
+        return {"status_code": 200, "detail": "User created successfully"}
+    except Exception as e:
+        return {"status_code": 400, "detail": str(e)}
 
 
 @users_router.post("/token")
@@ -19,9 +51,6 @@ def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db=Depends(user_handler_utils.get_db),
 ):
-    print(form_data)
-    print(form_data.username)
-    print(form_data.password)
     user = authenticate_user(
         username=form_data.username,
         password=form_data.password,
@@ -33,10 +62,10 @@ def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=30)
+
     access_token = create_access_token(
         data={"sub": user.username},
-        expire_delta=access_token_expires,
+        expire_delta=timedelta(minutes=30),
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
