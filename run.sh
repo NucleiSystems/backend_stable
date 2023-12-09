@@ -2,8 +2,6 @@
 
 # Pull the latest changes from the remote repository
 
-
-
 # Activate the virtual environment
 source venv/bin/activate
 
