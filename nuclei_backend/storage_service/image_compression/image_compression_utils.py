@@ -1,7 +1,10 @@
+import asyncio
 import logging
 import pathlib
-from concurrent.futures import ProcessPoolExecutor
 import zlib
+
+from aiofiles import open as aio_open
+from concurrent.futures import ProcessPoolExecutor
 
 from ..CompressionBase import CompressionImpl
 
@@ -16,19 +19,19 @@ class CompressImage(CompressionImpl):
         self.filename = filename
         self.compression_temp_file = self.save_to_temp(self.file, self.filename)
 
-    def cleanup_compression_outcome(self):
+    async def cleanup_compression_outcome(self):
         try:
-            pathlib.Path(self.compression_temp_file[0]).unlink()
+            await asyncio.to_thread(pathlib.Path(self.compression_temp_file[0]).unlink)
         except FileNotFoundError:
             pass
 
     def compress_chunk(self, chunk):
         return zlib.compress(chunk)
 
-    def produce_compression(self) -> bytes:
+    async def produce_compression(self) -> bytes:
         print("compressing image")
-        with open(self.compression_temp_file[0], "rb") as f:
-            original_data = f.read()
+        async with aio_open(self.compression_temp_file[0], "rb") as f:
+            original_data = await f.read()
 
         chunk_size = 8192  # Adjust the chunk size based on your requirements
         chunks = [
@@ -37,6 +40,8 @@ class CompressImage(CompressionImpl):
         ]
 
         with ProcessPoolExecutor() as executor:
-            compressed_chunks = list(executor.map(self.compress_chunk, chunks))
+            compressed_chunks = await asyncio.to_thread(
+                executor.map, self.compress_chunk, chunks
+            )
 
         return b"".join(compressed_chunks)

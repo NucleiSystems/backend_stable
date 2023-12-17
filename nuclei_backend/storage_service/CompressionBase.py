@@ -2,7 +2,10 @@ import pathlib
 from typing import Literal
 from uuid import uuid4
 
-from .ipfs_utils import assemble_record, produce_cid
+from nuclei_backend.storage_service.ipfs_utils import (
+    assemble_record,
+    produce_cid,
+)
 
 
 class CompressionImpl:
@@ -35,10 +38,10 @@ class CompressionImpl:
         file_uuid = file_path[temp_file_index:][9:-4]
         return f"{parsed_file_path}/compressed_temp{file_uuid}"
 
-    def commit_to_ipfs(self, file, filename: str, user, db) -> str:
-        cid = produce_cid(file, filename)
-        data_record = self._create_data_record(file, filename, cid, user.id)
-        self._add_to_database(db, data_record)
+    async def commit_to_ipfs(self, file, filename: str, user, db) -> str:
+        cid = await produce_cid(file, filename)
+        data_record = await assemble_record(file, filename, cid, user.id)
+        await self._add_to_database(db, data_record)
         return cid
 
     def _create_data_record(
@@ -46,6 +49,6 @@ class CompressionImpl:
     ) -> object:
         return assemble_record(file, filename, cid, owner_id)
 
-    def _add_to_database(self, db, data_record: object) -> None:
+    async def _add_to_database(self, db, data_record: object) -> None:
         db.add(data_record)
         db.commit()
