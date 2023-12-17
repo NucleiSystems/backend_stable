@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
-from fastapi import BackgroundTasks, Depends, HTTPException, UploadFile, status
+from fastapi import BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 
 from ...users.auth_utils import get_current_user
 from ...users.user_handler_utils import get_db
@@ -46,9 +46,9 @@ def process_files(
 
 @storage_service.post("/compress/image")
 async def compress_task_image(
-    files: List[UploadFile],  # noqa: F405
     background_tasks: BackgroundTasks,
     ipfs_flag: bool | None = True,
+    files: List[UploadFile] = File(...),  # noqa: F405
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
