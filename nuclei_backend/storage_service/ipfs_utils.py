@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import datetime
 import os
-import os.path
 import pathlib
+import subprocess
 import time
-from typing import *  # noqa: F403
+from typing import LiteralString
 from uuid import uuid4
 
 from typing_extensions import LiteralString
@@ -20,13 +20,13 @@ def ensure_dir(path: str) -> None:
 
 def save_temp_file(file, filename: str) -> str:
     unique_id = str(uuid4())
-    _filename = f"filename{unique_id}.{filename[-4:]}"
-    _file_path = os.path.join(Config.TEMP_FOLDER, _filename)
+    temp_filename = f"{filename}-{unique_id}{filename[-4:]}"
+    temp_file_path = pathlib.Path(Config.TEMP_FOLDER) / temp_filename
 
-    with open(_file_path, "wb") as f:
+    with open(temp_file_path, "wb") as f:
         f.write(file)
 
-    return _file_path
+    return str(temp_file_path)
 
 
 def remove(path):
@@ -35,61 +35,53 @@ def remove(path):
 
 def generate_hash(cid: LiteralString) -> str:
     unique_id = str(uuid4())
-    _bat_path = os.path.join(Config.TEMP_FOLDER, f"hash{unique_id}.bat")
-    _buffer_path = os.path.join(Config.TEMP_FOLDER, f"hash{unique_id}.txt")
+    hash_bat_path = pathlib.Path(Config.TEMP_FOLDER) / f"hash-{unique_id}.bat"
+    buffer_path = pathlib.Path(Config.TEMP_FOLDER) / f"hash-{unique_id}.txt"
 
-    with open(_bat_path, "w") as f:
-        f.write("#!/bin/bash")
-        f.write("\n")
-        f.write(rf"cd {Config.TEMP_FOLDER}")
-        f.write("\n")
-        f.write(rf"{Config.KUBO_PATH} ls -v {cid} > hash{unique_id}.txt")
+    with open(hash_bat_path, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write(rf"cd {Config.TEMP_FOLDER}\n")
+        f.write(rf"{Config.KUBO_PATH} ls -v {cid} > {buffer_path}")
 
-    os.chmod(_bat_path, 0b111101101)
+    hash_bat_path.chmod(0o755)
 
-    os.popen(_bat_path)
+    subprocess.run([hash_bat_path], shell=True)
     time.sleep(1)
 
-    with open(_buffer_path, "r") as f:
+    with open(buffer_path, "r") as f:
         _hash = f.read().strip()
 
-    remove(_bat_path)
-    remove(_buffer_path)
+    remove(hash_bat_path)
+    remove(buffer_path)
 
     return _hash
 
 
 def produce_cid(file: bytes, filename: str) -> LiteralString:
-    if not os.path.exists(Config.TEMP_FOLDER):
-        ensure_dir(Config.TEMP_FOLDER)
-    try:
-        path = str(Config.TEMP_FOLDER)
-        unique_id = str(uuid4())
-        _bat_path = os.path.join(Config.TEMP_FOLDER, f"cid{unique_id}.sh")
-        _buffer_path = os.path.join(Config.TEMP_FOLDER, f"cid{unique_id}.txt")
-        _temp_file_path = save_temp_file(file, filename)
-    except Exception as e:
-        raise e
-    print(_temp_file_path)
+    ensure_dir(Config.TEMP_FOLDER)
 
-    with open(_bat_path, "w") as f:
-        f.write("#!/bin/bash")
-        f.write("\n")
-        f.write(rf"cd {Config.TEMP_FOLDER}")
-        f.write("\n")
+    unique_id = str(uuid4())
+    cid_bat_path = pathlib.Path(Config.TEMP_FOLDER) / f"cid-{unique_id}.sh"
+    buffer_path = pathlib.Path(Config.TEMP_FOLDER) / f"cid-{unique_id}.txt"
+    temp_file_path = save_temp_file(file, filename)
+
+    with open(cid_bat_path, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write(rf"cd {Config.TEMP_FOLDER}\n")
         f.write(
-            rf"{Config.KUBO_PATH} add --quiet --pin {_temp_file_path} > {path}/cid{unique_id}.txt"  # noqa: E501
+            rf"{Config.KUBO_PATH} add --quiet --pin {temp_file_path} > {buffer_path}\n"
         )
 
-    os.chmod(_bat_path, 0b111101101)
-    os.popen(_bat_path)
+    cid_bat_path.chmod(0o755)
+    subprocess.run([cid_bat_path], shell=True)
     time.sleep(1)
-    with open(pathlib.Path(_buffer_path), "r") as f:
+
+    with open(buffer_path, "r") as f:
         cid = f.read().strip()
 
-    remove(_bat_path)
-    remove(_buffer_path)
-    pathlib.Path(_temp_file_path).unlink()
+    remove(cid_bat_path)
+    remove(buffer_path)
+    temp_file_path.unlink()
 
     return cid
 

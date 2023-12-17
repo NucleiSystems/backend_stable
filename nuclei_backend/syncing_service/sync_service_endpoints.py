@@ -4,7 +4,7 @@ import time
 import typing
 import asyncio
 from fastapi_utils.tasks import repeat_every
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi import BackgroundTasks, status
 from concurrent.futures import ThreadPoolExecutor
 
@@ -29,7 +29,7 @@ import logging
 import datetime
 
 
-def process_file(user, db) -> None:
+async def process_file(user, db) -> None:
     try:
         cids = get_user_cids(user.id, db)
         get_collective_bytes(user.id, db)
@@ -42,19 +42,24 @@ def process_file(user, db) -> None:
 
         file_listener = FileListener(user.id, files.session_id)
         file_listener.file_listener()
-        time.sleep(10)
+
+        await asyncio.sleep(10)  # Use asynchronous sleep
+
         redis_controller.set_file_count(len(cids))
 
         try:
             files.cleanup()
-        except Exception as e:
-            print(e)
+        except PermissionError as pe:
+            logging.error(f"Error during cleanup: {pe}")
 
         file_session_cache.deactivate_file_session()
         redis_controller.close()
         file_session_cache.close()
+
+    except HTTPException as http_exception:
+        logging.error(f"HTTPException: {http_exception.detail}")
     except Exception as e:
-        print(e)
+        logging.error(f"An unexpected error occurred: {e}")
 
 
 async def process_files(user, db):

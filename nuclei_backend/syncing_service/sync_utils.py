@@ -7,9 +7,9 @@ import shutil
 import subprocess
 import time
 from uuid import uuid4
-import datetime
 from fastapi import HTTPException
-
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from ..storage_service.ipfs_model import DataStorage
 
 
@@ -66,29 +66,36 @@ class UserDataExtraction:
             os.path.join(os.path.dirname(__file__), "utils/ipfs")
         )
 
+    async def download_file(self, cid):
+        try:
+            subprocess.check_call(
+                [
+                    f"{self.ipfs_path}",
+                    "get",
+                    cid.file_cid,
+                    "-o",
+                    cid.file_name,
+                    "--progress=true",
+                ]
+            )
+        except Exception as e:
+            raise e
+
+    async def download_files_async(self):
+        with ThreadPoolExecutor(max_workers=len(self.cids)) as executor:
+            loop = asyncio.get_event_loop()
+            tasks = [
+                loop.run_in_executor(executor, self.download_file, cid)
+                for cid in self.cids
+            ]
+            await asyncio.gather(*tasks)
+
     def download_file_ipfs(self):
         os.mkdir(self.new_folder)
         os.chdir(self.new_folder)
 
-        for cid in self.cids:
-            while True:
-                try:
-                    subprocess.check_call(
-                        [
-                            f"{self.ipfs_path}",
-                            "get",
-                            cid.file_cid,
-                            "-o",
-                            cid.file_name,
-                            "--progress=true",
-                        ]
-                    )
-
-                    time.sleep(5)
-                    if os.path.isfile(cid.file_name):
-                        break
-                except Exception as e:
-                    raise e
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.download_files_async())
 
         self.write_file_summary()
 

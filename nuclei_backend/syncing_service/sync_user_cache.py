@@ -11,10 +11,11 @@ import redis
 
 
 class RedisController:
+    redis_connection = redis.Redis().from_url(
+        url="redis://127.0.0.1:6379", decode_responses=True, db=0
+    )
+
     def __init__(self, user):
-        self.redis_connection = redis.Redis().from_url(
-            url="redis://127.0.0.1:6379", decode_responses=True, db=0
-        )
         self.user = user
 
     def set_files(self, file: list[dict[str, bytes]]):
@@ -49,12 +50,14 @@ class RedisController:
 class FileSessionManager:
     """A cache entry for a file in a directory."""
 
+    redis_connection = redis.Redis().from_url(
+        url="redis://127.0.0.1:6379", decode_responses=True, db=1
+    )
+
     def __init__(self, dir_id):
         """Create a new file cache entry for the specified directory."""
         self.dir_id = dir_id
-        self.redis_connection = redis.Redis().from_url(
-            url="redis://127.0.0.1:6379", decode_responses=True, db=1
-        )
+
         self.time_delta = datetime.timedelta(seconds=30)
         self.time_now = time.time()
 
@@ -75,10 +78,11 @@ class FileSessionManager:
 
 
 class FileCleanerSchedule:
+    redis_connection = redis.Redis().from_url(
+        url="redis://127.0.0.1:6379", decode_responses=True, db=1
+    )
+
     def __init__(self) -> None:
-        self.redis_connection = redis.Redis().from_url(
-            url="redis://127.0.0.1:6379", decode_responses=True, db=1
-        )
         self.all_sessions = [
             keys for keys in self.redis_connection.scan_iter("processing:*")
         ]
@@ -128,7 +132,6 @@ class FileListener(RedisController):
     def __init__(self, user_id, session_id):
         super().__init__(user_id)
         self.user_id = user_id
-        self.redis = RedisController(user_id)
         self.session_id = session_id
 
     def file_listener(self):

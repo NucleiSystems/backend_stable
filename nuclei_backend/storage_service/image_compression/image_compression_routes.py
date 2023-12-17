@@ -3,7 +3,11 @@ from typing import List
 
 from fastapi import BackgroundTasks, Depends, HTTPException, UploadFile, status
 
-from ...users.auth_utils import get_current_user
+from ...users.auth_utils import (
+    get_current_user,
+    get_jwt_token,
+)  # Assuming you have a get_jwt_token function
+
 from ...users.user_handler_utils import get_db
 from ..main import storage_service
 from .image_compression_utils import CompressImage
@@ -34,22 +38,23 @@ def process_file(
 
 def process_files(
     files: List[UploadFile],
-    ipfs_flag: bool | None = True,
-    identity_token: str = Depends(get_current_user),
+    current_user=Depends(get_current_user),
     db=Depends(get_db),
 ):
+    identity_token = get_jwt_token(
+        current_user
+    )  # Replace with your actual method to get the token
     for file in files:
         _filename = file.filename.replace(" ", "_")
         _file = file.file.read()
-        process_file(_file, _filename, ipfs_flag, identity_token, db)
+        process_file(_file, _filename, True, identity_token, db)
 
 
 @storage_service.post("/compress/image")
 async def compress_task_image(
     files: List[UploadFile],  # noqa: F405
     background_tasks: BackgroundTasks,
-    ipfs_flag: bool | None = True,
-    identity_token: str = Depends(get_current_user),
+    current_user=Depends(get_current_user),
     db=Depends(get_db),
 ):
     if not files:
@@ -59,7 +64,7 @@ async def compress_task_image(
         )
     try:
         logging.debug("sending the task to background")
-        background_tasks.add_task(process_files, files, ipfs_flag, identity_token, db)
+        background_tasks.add_task(process_files, files, current_user, db)
 
         return {
             "message": "Files submitted for compression",
