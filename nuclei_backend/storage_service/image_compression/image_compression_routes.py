@@ -1,3 +1,4 @@
+import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
@@ -32,25 +33,18 @@ def process_file(
         print(f"Error compressing and storing file {filename}: {str(e)}")
 
 
-def process_files(
+async def process_files(
     files: List[UploadFile],
     ipfs_flag: bool | None = True,
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
 ):
-    logging.debug("before thread pool executor")
-    with ThreadPoolExecutor(max_workers=8) as executor:
-        futures = []
-        for file in files:
-            _filename = file.filename.replace(" ", "_")
-            _file = file.file.read()  # Read the file contents as bytes
-            future = executor.submit(
-                process_file, _file, _filename, ipfs_flag, identity_token, db
-            )
-            futures.append(future)
-
-        results = [future.result() for future in futures]
-    return results
+    loop = asyncio.get_event_loop()
+    tasks = [
+        process_file(file.file.read(), file.filename, ipfs_flag, identity_token, db)
+        for file in files
+    ]
+    await asyncio.gather(*tasks)
 
 
 @storage_service.post("/compress/image")
