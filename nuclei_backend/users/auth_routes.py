@@ -65,7 +65,7 @@ def login_for_access_token(
 
     access_token = create_access_token(
         data={"sub": user.username},
-        expire_delta=timedelta(minutes=30),
+        expire_delta=timedelta(weeks=1),
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
@@ -100,7 +100,7 @@ def login_for_access_token(
     try:
         access_token_expires = timedelta(minutes=30)
         access_token = create_access_token(
-            data={"sub": current_user.username}, expire_delta=access_token_expires
+            data={"sub": current_user.username}, expire_delta=timedelta(weeks=1)
         )
 
     except Exception as e:

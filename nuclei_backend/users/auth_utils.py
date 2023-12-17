@@ -68,6 +68,19 @@ async def get_google_oauth_token(request: Request) -> dict:
 
 
 def create_access_token(
+    data: dict,
+    expire_delta: Optional[timedelta] = UsersConfig.ACCESS_TOKEN_EXPIRE_MINUTES,
+) -> str:
+    data_to_encode = data.copy()
+    if expire_delta:
+        expire = datetime.utcnow() + expire_delta
+        data_to_encode.update({"exp": expire})
+    return jwt.encode(
+        data_to_encode, UsersConfig.SECRET_KEY, algorithm=UsersConfig.ALGORITHM
+    )
+
+
+def create_access_token(
     data: dict, expire_delta: Optional[int] = UsersConfig.ACCESS_TOKEN_EXPIRE_MINUTES
 ) -> str:
     data_to_encode = data.copy()
