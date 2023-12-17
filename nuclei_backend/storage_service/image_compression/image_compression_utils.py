@@ -1,5 +1,6 @@
 import logging
 import pathlib
+from concurrent.futures import ProcessPoolExecutor
 import zlib
 
 from ..CompressionBase import CompressionImpl
@@ -21,17 +22,21 @@ class CompressImage(CompressionImpl):
         except FileNotFoundError:
             pass
 
+    def compress_chunk(self, chunk):
+        return zlib.compress(chunk)
+
     def produce_compression(self) -> bytes:
-        print("Compressing image")
-        chunk_size = 8192  # Adjust the chunk size based on your requirements
-
+        print("compressing image")
         with open(self.compression_temp_file[0], "rb") as f:
-            with zlib.compressobj() as compressor:
-                compressed_data = b""
-                while chunk := f.read(chunk_size):
-                    compressed_data += compressor.compress(chunk)
+            original_data = f.read()
 
-                # Flush the compressor
-                compressed_data += compressor.flush()
+        chunk_size = 8192  # Adjust the chunk size based on your requirements
+        chunks = [
+            original_data[i : i + chunk_size]
+            for i in range(0, len(original_data), chunk_size)
+        ]
 
-        return compressed_data
+        with ProcessPoolExecutor() as executor:
+            compressed_chunks = list(executor.map(self.compress_chunk, chunks))
+
+        return b"".join(compressed_chunks)
