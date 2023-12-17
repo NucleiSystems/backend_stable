@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import psutil
 import zlib
 
 from ..CompressionBase import CompressionImpl
