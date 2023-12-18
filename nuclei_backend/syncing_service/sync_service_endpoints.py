@@ -1,11 +1,7 @@
-import hashlib
 import json
-import time
-import typing
 import asyncio
 from fastapi import Depends, HTTPException
 from fastapi import BackgroundTasks, status
-from concurrent.futures import ThreadPoolExecutor
 from fastapi_utils.tasks import repeat_every
 
 from ..storage_service.ipfs_model import DataStorage
@@ -22,7 +18,6 @@ from .sync_user_cache import (
 from .sync_utils import (
     UserDataExtraction,
     get_collective_bytes,
-    get_user_cid,
     get_user_cids,
 )
 import logging
@@ -37,7 +32,7 @@ async def process_files(user, db):
         file_session_cache = FileSessionManager(files.session_id)
         file_session_cache.activate_file_session()
         redis_controller = RedisController(user=str(user.id))
-        files.download_file_ipfs()
+        await files.download_file_ipfs()  # await here
         files.write_file_summary()
 
         file_listener = FileListener(user.id, files.session_id)

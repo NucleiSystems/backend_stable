@@ -11,6 +11,18 @@ from fastapi import HTTPException
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from ..storage_service.ipfs_model import DataStorage
+import asyncio
+import aiohttp
+import json
+import logging
+import os
+import pathlib
+import shutil
+import time
+from uuid import uuid4
+from fastapi import HTTPException
+from concurrent.futures import ThreadPoolExecutor
+from ..storage_service.ipfs_model import DataStorage
 
 
 def get_user_cids(user_id, db) -> list:
@@ -64,41 +76,36 @@ class UserDataExtraction:
 
     async def download_file(self, cid):
         try:
-            await asyncio.to_thread(
-                subprocess.check_call,
-                [
-                    f"{self.ipfs_path}",
-                    "get",
-                    cid.file_cid,
-                    "-o",
-                    cid.file_name,
-                    "--progress=true",
-                ],
-            )
-        except subprocess.CalledProcessError as e:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"{self.ipfs_path}/get/{cid.file_cid}"
+                ) as response:
+                    with open(cid.file_name, "wb") as f:
+                        f.write(await response.read())
+        except Exception as e:
             logging.error(f"Error downloading file {cid.file_name}: {e}")
             raise
 
     async def download_files_async(self):
-        with ThreadPoolExecutor(max_workers=len(self.cids)) as executor:
-            loop = asyncio.get_event_loop()
-            tasks = [
-                loop.run_in_executor(executor, self.download_file, cid)
-                for cid in self.cids
-            ]
-            await asyncio.gather(*tasks)
+        async def download_file_async(cid):
+            try:
+                await self.download_file(cid)
+            except Exception as e:
+                logging.error(f"Error downloading file {cid.file_name}: {e}")
+                raise
 
-    def download_file_ipfs(self):
+        await asyncio.gather(*(download_file_async(cid) for cid in self.cids))
+
+    async def download_file_ipfs(self):
         os.mkdir(self.new_folder)
         os.chdir(self.new_folder)
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.download_files_async())
+        await self.download_files_async()
 
         self.write_file_summary()
 
         while not self.insurance():
-            time.sleep(5)
+            await asyncio.sleep(5)
 
     def write_file_summary(self):
         with contextlib.suppress(PermissionError):
