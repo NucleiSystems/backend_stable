@@ -11,24 +11,30 @@ from .image_compression_utils import CompressImage
 import logging
 
 
-def process_file(
+async def process_file(
     file: bytes, filename: str, ipfs_flag: bool, identity_token: str, db
 ) -> None:
     try:
+        loop = asyncio.get_event_loop()
         compressing_file = CompressImage(file, filename)
 
-        print("files compressed")
-        compressed_file = compressing_file.produce_compression()
+        compressed_file = await loop.run_in_executor(
+            None, compressing_file.produce_compression
+        )
         if ipfs_flag:
-            print("before ipfs flag")
             try:
                 with db as _db:
-                    compressing_file.commit_to_ipfs(
-                        compressed_file, filename, identity_token, _db
+                    await loop.run_in_executor(
+                        None,
+                        compressing_file.commit_to_ipfs,
+                        compressed_file,
+                        filename,
+                        identity_token,
+                        _db,
                     )
             except Exception as e:
                 print(f"the error was {e}")
-        compressing_file.cleanup_compression_outcome()
+        await loop.run_in_executor(None, compressing_file.cleanup_compression_outcome)
     except Exception as e:
         print(f"Error compressing and storing file {filename}: {str(e)}")
 
@@ -50,7 +56,7 @@ async def process_files(
 @storage_service.post("/compress/image")
 async def compress_task_image(
     background_tasks: BackgroundTasks,
-    files: List[UploadFile] = File(...),  # noqa: F405
+    files: List[UploadFile] = File(...),
     ipfs_flag: bool | None = True,
     identity_token: str = Depends(get_current_user),
     db=Depends(get_db),
