@@ -16,22 +16,22 @@ from ..storage_service.ipfs_model import DataStorage
 def get_user_cids(user_id, db) -> list:
     try:
         query = db.query(DataStorage).filter(DataStorage.owner_id == user_id).all()
-
-        return query
-    except Exception as e:
-        logging.error(
-            f"An Error occured in get_user_cids, error is:{e}"
-            "error occured at: {str(datetime.datetime.now())}"
-        )
-        raise HTTPException(status_code=500, detail="Internal Server Error") from e
-
-
-def get_user_cids(user_id, db) -> list:
-    try:
-        query = db.query(DataStorage).filter(DataStorage.owner_id == user_id).all()
         return query
     except Exception as e:
         logging.error(f"An Error occurred in get_user_cids: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error") from e
+
+
+def get_user_cid(user_id, db, item_id) -> list:
+    try:
+        query = (
+            db.query(DataStorage)
+            .filter(DataStorage.owner_id == user_id, DataStorage.id == item_id)
+            .first()
+        )
+        return query
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(status_code=500, detail="Internal Server Error") from e
 
 
@@ -74,9 +74,8 @@ class UserDataExtraction:
                     "--progress=true",
                 ]
             )
-        except subprocess.CalledProcessError as e:
-            logging.error(f"Error downloading file {cid.file_name}: {e}")
-            raise
+        except Exception as e:
+            raise e
 
     async def download_files_async(self):
         with ThreadPoolExecutor(max_workers=len(self.cids)) as executor:
@@ -126,6 +125,7 @@ class UserDataExtraction:
     def cleanup(self):
         with contextlib.suppress(PermissionError):
             os.chdir(pathlib.Path(self.new_folder).parent)
+
             shutil.rmtree(
                 pathlib.Path(self.new_folder),
                 ignore_errors=False,
