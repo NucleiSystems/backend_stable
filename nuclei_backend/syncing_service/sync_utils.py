@@ -64,7 +64,8 @@ class UserDataExtraction:
 
     async def download_file(self, cid):
         try:
-            subprocess.check_call(
+            await asyncio.to_thread(
+                subprocess.check_call,
                 [
                     f"{self.ipfs_path}",
                     "get",
@@ -72,10 +73,11 @@ class UserDataExtraction:
                     "-o",
                     cid.file_name,
                     "--progress=true",
-                ]
+                ],
             )
-        except Exception as e:
-            raise e
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Error downloading file {cid.file_name}: {e}")
+            raise
 
     async def download_files_async(self):
         with ThreadPoolExecutor(max_workers=len(self.cids)) as executor:
