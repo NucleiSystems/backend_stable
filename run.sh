@@ -20,4 +20,4 @@ chmod +x /home/backend_stable/nuclei_backend/syncing_service/utils/ipfs
 nohup /nuclei_backend/storage_service/ipfs daemon --init --enable-pubsub-experiment > ipfs.log 2>&1 &
 
 # Start Uvicorn server
-uvicorn nuclei_backend:app --host 0.0.0.0 --port 8000 --loop uvloop
+uvicorn nuclei_backend:app --host 0.0.0.0 --port 8000 
