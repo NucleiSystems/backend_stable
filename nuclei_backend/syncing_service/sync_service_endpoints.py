@@ -29,7 +29,7 @@ import logging
 import datetime
 
 
-async def process_file(user, db) -> None:
+async def process_files(user, db):
     try:
         cids = get_user_cids(user.id, db)
         get_collective_bytes(user.id, db)
@@ -43,7 +43,8 @@ async def process_file(user, db) -> None:
         file_listener = FileListener(user.id, files.session_id)
         file_listener.file_listener()
 
-        await asyncio.sleep(10)  # Use asynchronous sleep
+        # Use asynchronous sleep
+        await asyncio.sleep(10)
 
         redis_controller.set_file_count(len(cids))
 
@@ -62,15 +63,6 @@ async def process_file(user, db) -> None:
         logging.error(f"An unexpected error occurred: {e}")
 
 
-async def process_files(user, db):
-    loop = asyncio.get_event_loop()
-    with ThreadPoolExecutor(max_workers=8) as executor:
-        future = loop.run_in_executor(executor, process_file, user, db)
-        result = await future
-
-    return result
-
-
 @sync_router.get("/fetch/all")
 async def dispatch_all(
     background_tasks: BackgroundTasks,
@@ -78,12 +70,12 @@ async def dispatch_all(
     db=Depends(get_db),
 ):
     try:
-        background_tasks.add_task(process_files, user, db)
+        await process_files(user, db)
         return {
             "message": "Dispatched",
         }, status.HTTP_202_ACCEPTED
     except Exception as e:
-        return {"error": e}
+        return {"error": str(e)}
 
 
 @sync_router.on_event("startup")
