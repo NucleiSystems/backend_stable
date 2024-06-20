@@ -1,4 +1,4 @@
-FROM python:3.12.0rc2-slim
+FROM python:slim-bookworm
 
 RUN apt-get update && apt-get install -y \
     build-essential \
