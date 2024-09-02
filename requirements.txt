@@ -19,7 +19,7 @@ fastapi==0.94.1
 uvicorn==0.15.0  # Update version to a compatible one
 pycryptodome==3.10.1  # Update package name and version
 passlib==1.7.4
-Pillow==9.4.0
+Pillow==10.0.1
 psutil==5.8.0
 celery==5.2.2
 numpy==1.23.2  # Update version to a compatible one
