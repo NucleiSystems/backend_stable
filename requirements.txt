@@ -10,7 +10,7 @@ SQLAlchemy==1.4.46
 pytest-cov==3.0.0  # Update version to a compatible one
 zstandard==0.15.2
 pydantic==1.10.4
-gevent==22.10.2
+gevent==23.9.0
 colorama==0.4.6
 starlette>=0.14.2
 fastapi_utils
